@@ -106,9 +106,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 const DEMO_USERS: Record<string, User> = {
   "admin@ncrb.gov.in": {
     id: "usr-admin-001",
+    employee_id: "NCRB-ADM-9941",
     email: "admin@ncrb.gov.in",
     full_name: "Rohan T. (Admin)",
-    badge_number: "NCRB-ADM-9941",
     department: "National Cyber Crime Records",
     role: "system_admin",
     is_active: true,
@@ -118,11 +118,11 @@ const DEMO_USERS: Record<string, User> = {
   },
   "forensic@ncrb.gov.in": {
     id: "usr-forensic-002",
+    employee_id: "DFL-MHA-4412",
     email: "forensic@ncrb.gov.in",
     full_name: "Dr. A. Verma (Forensics)",
-    badge_number: "DFL-MHA-4412",
     department: "Digital Forensics Laboratory",
-    role: "forensic_examiner",
+    role: "forensic_expert",
     is_active: true,
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
@@ -130,11 +130,11 @@ const DEMO_USERS: Record<string, User> = {
   },
   "officer@ncrb.gov.in": {
     id: "usr-io-003",
+    employee_id: "NCIB-INV-2088",
     email: "officer@ncrb.gov.in",
     full_name: "Inspector Vikram S. (IO)",
-    badge_number: "NCIB-INV-2088",
     department: "Cyber Crime Operations",
-    role: "investigating_officer",
+    role: "investigator",
     is_active: true,
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
@@ -142,11 +142,11 @@ const DEMO_USERS: Record<string, User> = {
   },
   "io@ncrb.gov.in": {
     id: "usr-io-003",
+    employee_id: "NCIB-INV-2088",
     email: "io@ncrb.gov.in",
     full_name: "Inspector Vikram S. (IO)",
-    badge_number: "NCIB-INV-2088",
     department: "Cyber Crime Operations",
-    role: "investigating_officer",
+    role: "investigator",
     is_active: true,
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
@@ -154,11 +154,11 @@ const DEMO_USERS: Record<string, User> = {
   },
   "prosecutor@ncrb.gov.in": {
     id: "usr-pros-004",
+    employee_id: "MHA-LEG-1092",
     email: "prosecutor@ncrb.gov.in",
     full_name: "Adv. Rajesh Kumar (Prosecutor)",
-    badge_number: "MHA-LEG-1092",
     department: "Directorate of Prosecution",
-    role: "court_prosecutor",
+    role: "legal_officer",
     is_active: true,
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
@@ -166,11 +166,11 @@ const DEMO_USERS: Record<string, User> = {
   },
   "legal@ncrb.gov.in": {
     id: "usr-leg-005",
+    employee_id: "BSA-REV-8831",
     email: "legal@ncrb.gov.in",
     full_name: "S. Nambiar (Legal Reviewer)",
-    badge_number: "BSA-REV-8831",
     department: "Legal Affairs & BSA Compliance",
-    role: "legal_reviewer",
+    role: "legal_officer",
     is_active: true,
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
@@ -221,13 +221,13 @@ export async function login(credentials: LoginRequest): Promise<TokenResponse> {
   } catch {
     // Seamless fallback for local evaluation and demo credentials
     const normalizedEmail = credentials.email.toLowerCase().trim();
-    const demoUser = DEMO_USERS[normalizedEmail] || {
+    const demoUser: User = DEMO_USERS[normalizedEmail] || {
       id: `usr-demo-${Date.now()}`,
+      employee_id: "NCRB-DEMO-2026",
       email: credentials.email,
       full_name: (credentials.email.split("@")[0] || "Officer").toUpperCase() + " (Officer)",
-      badge_number: "NCRB-DEMO-2026",
       department: "National Cyber Crime Records",
-      role: "system_admin" as const,
+      role: "system_admin",
       is_active: true,
       is_locked: false,
       created_at: new Date().toISOString(),
