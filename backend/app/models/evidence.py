@@ -66,19 +66,19 @@ class Evidence(BaseModel):
     __tablename__ = "evidence"
     __table_args__ = (
         CheckConstraint(
-            f"evidence_type IN ({', '.join(f"'{t}'" for t in EVIDENCE_TYPES)})",
+            "evidence_type IN ('" + "', '".join(EVIDENCE_TYPES) + "')",
             name="chk_evidence_type",
         ),
         CheckConstraint(
-            f"status IN ({', '.join(f"'{s}'" for s in EVIDENCE_STATUSES)})",
+            "status IN ('" + "', '".join(EVIDENCE_STATUSES) + "')",
             name="chk_evidence_status",
         ),
         CheckConstraint(
-            f"sensitivity_level IN ({', '.join(f"'{sl}'" for sl in EVIDENCE_SENSITIVITY)})",
+            "sensitivity_level IN ('" + "', '".join(EVIDENCE_SENSITIVITY) + "')",
             name="chk_evidence_sensitivity",
         ),
         CheckConstraint(
-            f"integrity_status IN ({', '.join(f"'{i}'" for i in EVIDENCE_INTEGRITY_STATUSES)})",
+            "integrity_status IN ('" + "', '".join(EVIDENCE_INTEGRITY_STATUSES) + "')",
             name="chk_evidence_integrity",
         ),
         Index("ix_evidence_case_id", "case_id"),

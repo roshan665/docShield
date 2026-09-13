@@ -47,11 +47,11 @@ class EvidenceCustodyEvent(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "evidence_custody_events"
     __table_args__ = (
         CheckConstraint(
-            f"event_type IN ({', '.join(f"'{t}'" for t in CUSTODY_EVENT_TYPES)})",
+            "event_type IN ('" + "', '".join(CUSTODY_EVENT_TYPES) + "')",
             name="chk_custody_event_type",
         ),
         CheckConstraint(
-            f"acknowledgement_status IN ({', '.join(f"'{s}'" for s in CUSTODY_ACKNOWLEDGEMENT_STATUSES)})",
+            "acknowledgement_status IN ('" + "', '".join(CUSTODY_ACKNOWLEDGEMENT_STATUSES) + "')",
             name="chk_custody_ack_status",
         ),
         Index("ix_custody_evidence_id", "evidence_id"),

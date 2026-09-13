@@ -50,7 +50,7 @@ class DocumentMetadata(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "document_metadata"
     __table_args__ = (
         CheckConstraint(
-            f"source IN ({', '.join(f"'{s}'" for s in METADATA_SOURCES)})",
+            "source IN ('" + "', '".join(METADATA_SOURCES) + "')",
             name="chk_document_metadata_source",
         ),
         Index("ix_document_metadata_doc_key", "document_id", "key"),
@@ -88,7 +88,7 @@ class ExtractedEntity(Base, UUIDPrimaryKeyMixin):
     __tablename__ = "extracted_entities"
     __table_args__ = (
         CheckConstraint(
-            f"entity_type IN ({', '.join(f"'{t}'" for t in ENTITY_TYPES)})",
+            "entity_type IN ('" + "', '".join(ENTITY_TYPES) + "')",
             name="chk_extracted_entity_type",
         ),
         Index("ix_extracted_entities_document_id", "document_id"),

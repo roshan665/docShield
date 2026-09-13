@@ -66,15 +66,15 @@ class Document(BaseModel):
     __tablename__ = "documents"
     __table_args__ = (
         CheckConstraint(
-            f"document_type IN ({', '.join(f"'{t}'" for t in DOCUMENT_TYPES)})",
+            "document_type IN ('" + "', '".join(DOCUMENT_TYPES) + "')",
             name="chk_documents_type",
         ),
         CheckConstraint(
-            f"classification IN ({', '.join(f"'{c}'" for c in DOCUMENT_CLASSIFICATIONS)})",
+            "classification IN ('" + "', '".join(DOCUMENT_CLASSIFICATIONS) + "')",
             name="chk_documents_classification",
         ),
         CheckConstraint(
-            f"status IN ({', '.join(f"'{s}'" for s in DOCUMENT_STATUSES)})",
+            "status IN ('" + "', '".join(DOCUMENT_STATUSES) + "')",
             name="chk_documents_status",
         ),
         Index("ix_documents_case_id", "case_id"),

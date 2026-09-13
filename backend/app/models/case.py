@@ -53,11 +53,11 @@ class Case(BaseModel):
     __tablename__ = "cases"
     __table_args__ = (
         CheckConstraint(
-            f"status IN ({', '.join(f"'{s}'" for s in CASE_STATUSES)})",
+            "status IN ('" + "', '".join(CASE_STATUSES) + "')",
             name="chk_cases_status",
         ),
         CheckConstraint(
-            f"priority IN ({', '.join(f"'{p}'" for p in CASE_PRIORITIES)})",
+            "priority IN ('" + "', '".join(CASE_PRIORITIES) + "')",
             name="chk_cases_priority",
         ),
     )
@@ -125,7 +125,7 @@ class CaseMember(BaseModel):
     __tablename__ = "case_members"
     __table_args__ = (
         CheckConstraint(
-            f"role_in_case IN ({', '.join(f"'{r}'" for r in CASE_MEMBER_ROLES)})",
+            "role_in_case IN ('" + "', '".join(CASE_MEMBER_ROLES) + "')",
             name="chk_case_members_role",
         ),
         # Partial unique index ensuring a user is actively enrolled in a case at most once
