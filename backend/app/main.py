@@ -80,3 +80,11 @@ async def root():
         "docs": "/docs" if settings.DEBUG else "Disabled in production",
         "api_v1": settings.API_V1_STR,
     }
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")
