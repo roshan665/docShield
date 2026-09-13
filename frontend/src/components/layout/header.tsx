@@ -39,17 +39,18 @@ export function Header({ onOpenMobileDrawer }: HeaderProps) {
       </div>
 
       {/* Mobile Center Branding (visible only on mobile/tablet) */}
-      <div className="flex items-center gap-2.5 lg:hidden">
-        <div className="relative h-8 w-8 rounded-lg p-0.5 bg-gradient-to-b from-blue-500/20 to-blue-900/30 ring-1 ring-blue-400/30 shadow-sm">
+      <div className="flex items-center gap-2 lg:hidden">
+        <div className="relative h-8 w-8 drop-shadow-[0_2px_8px_rgba(37,99,235,0.4)]">
           <Image
-            src="/images/docshield-logo.png"
+            src="/images/docshield-shield.png"
             alt="DocShield Emblem"
             fill
             sizes="32px"
-            className="object-contain rounded-md"
+            className="object-contain"
+            priority
           />
         </div>
-        <span className="text-sm font-bold tracking-tight text-slate-950 uppercase font-sans">
+        <span className="text-sm font-extrabold tracking-tight text-slate-950 uppercase font-sans">
           DOCS<span className="text-blue-600 font-extrabold">SHIELD</span>
         </span>
       </div>

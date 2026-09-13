@@ -42,14 +42,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#081426] flex flex-col justify-between p-4 sm:p-6 text-white relative overflow-hidden selection:bg-blue-600 selection:text-white">
-      {/* Ambient Watermark Background Graphic */}
+      {/* Prominent Ambient Watermark Background Graphic */}
       <div 
-        className="absolute inset-0 bg-center bg-no-repeat bg-cover opacity-[0.06] mix-blend-luminosity pointer-events-none filter blur-[1px] scale-105"
-        style={{ backgroundImage: "url('/images/docshield-bg.jpg')" }}
+        className="absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.16] pointer-events-none filter drop-shadow-2xl scale-110"
+        style={{ backgroundImage: "url('/images/docshield-bg.png')" }}
       />
-      {/* Subtle Background Glow Accent */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Ambient Gradient Highlights */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Bar / Official Tag */}
       <div className="w-full flex items-center justify-between max-w-md mx-auto pt-2 z-10">
@@ -63,22 +63,22 @@ export default function LoginPage() {
       </div>
 
       {/* Main Center Auth Container */}
-      <div className="w-full max-w-sm mx-auto my-auto py-8 z-10">
-        {/* Logo & Brand Header */}
+      <div className="w-full max-w-sm mx-auto my-auto py-6 z-10">
+        {/* Logo & Brand Header - Shield Aligned Above DOCS SHIELD */}
         <div className="text-center mb-6">
           <div className="mx-auto mb-3 flex items-center justify-center">
-            <div className="relative h-20 w-20 rounded-2xl p-1 bg-gradient-to-b from-blue-500/30 to-blue-900/40 ring-1 ring-blue-400/40 shadow-2xl shadow-blue-600/30">
+            <div className="relative h-24 w-24 drop-shadow-[0_10px_25px_rgba(37,99,235,0.45)] hover:scale-105 transition-transform duration-300">
               <Image
-                src="/images/docshield-logo.png"
-                alt="DocShield Logo"
+                src="/images/docshield-shield.png"
+                alt="DocShield Emblem"
                 fill
-                sizes="80px"
-                className="object-contain rounded-xl"
+                sizes="96px"
+                className="object-contain"
                 priority
               />
             </div>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase font-sans">
+          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase font-sans drop-shadow-sm">
             DOCS SHIELD
           </h1>
           <p className="text-xs text-slate-300 font-medium mt-0.5">

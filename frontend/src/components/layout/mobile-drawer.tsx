@@ -86,25 +86,26 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
       {/* Slide-out Drawer */}
       <div className="fixed inset-y-0 left-0 flex w-full max-w-xs flex-col bg-[#0B1930] text-white shadow-2xl transition-transform animate-in slide-in-from-left duration-300">
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-4 bg-[#081426]">
+        {/* Drawer Header - Shield Above DOCS SHIELD */}
+        <div className="flex items-start justify-between border-b border-slate-800/80 px-5 py-4 bg-[#081426]">
           <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0 rounded-xl bg-gradient-to-b from-blue-500/20 to-blue-900/30 p-0.5 ring-1 ring-blue-400/30 shadow-md">
+            <div className="relative h-12 w-12 shrink-0 drop-shadow-[0_2px_10px_rgba(37,99,235,0.4)]">
               <Image
-                src="/images/docshield-logo.png"
+                src="/images/docshield-shield.png"
                 alt="DocShield Emblem"
                 fill
-                sizes="40px"
-                className="object-contain rounded-lg"
+                sizes="48px"
+                className="object-contain"
+                priority
               />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h2 className="text-base font-bold tracking-tight text-white uppercase font-sans">
+                <h2 className="text-base font-extrabold tracking-tight text-white uppercase font-sans">
                   DOCS SHIELD
                 </h2>
               </div>
-              <p className="text-[10px] text-blue-400 font-medium leading-tight">
+              <p className="text-[10px] text-blue-400 font-medium leading-tight mt-0.5">
                 Secure Evidence. Trusted Records.
               </p>
               <p className="text-[9px] text-slate-400 font-mono tracking-wider mt-0.5">

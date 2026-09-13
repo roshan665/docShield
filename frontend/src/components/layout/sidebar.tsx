@@ -55,32 +55,36 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 flex-col border-r border-slate-800 bg-[#0B1930] text-white shadow-xl">
-      {/* Brand Header */}
-      <div className="flex flex-col border-b border-slate-800/80 px-5 py-5 bg-[#081426]">
-        <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 shrink-0 rounded-xl bg-gradient-to-b from-blue-500/20 to-blue-900/30 p-0.5 ring-1 ring-blue-400/30 shadow-md">
+      {/* Brand Header - Shield Above DOCS SHIELD */}
+      <div className="flex flex-col border-b border-slate-800/80 px-5 py-5 bg-[#081426] text-center">
+        <div className="mx-auto mb-2 flex items-center justify-center">
+          <div className="relative h-14 w-14 drop-shadow-[0_4px_14px_rgba(37,99,235,0.45)] hover:scale-105 transition-transform duration-200">
             <Image
-              src="/images/docshield-logo.png"
+              src="/images/docshield-shield.png"
               alt="DocShield Emblem"
               fill
-              sizes="40px"
-              className="object-contain rounded-lg"
+              sizes="56px"
+              className="object-contain"
+              priority
             />
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <h1 className="text-base font-bold tracking-tight text-white uppercase font-sans">
-                DOCS SHIELD
-              </h1>
-              <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-blue-950/80 border border-blue-800/60 text-[9px] font-mono font-medium text-blue-300">
-                <Lock className="h-2 w-2" /> OFFICIAL
-              </span>
-            </div>
-            <p className="text-[10px] text-blue-400 font-medium leading-tight mt-0.5">
-              Secure Evidence. Trusted Records.
-            </p>
-          </div>
         </div>
+        
+        <div className="flex items-center justify-center gap-1.5">
+          <h1 className="text-base font-extrabold tracking-tight text-white uppercase font-sans">
+            DOCS SHIELD
+          </h1>
+          <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-blue-950/80 border border-blue-800/60 text-[8px] font-mono font-medium text-blue-300">
+            <Lock className="h-2 w-2" /> OFFICIAL
+          </span>
+        </div>
+        <p className="text-[10px] text-blue-400 font-medium leading-tight mt-0.5">
+          Secure Evidence. Trusted Records.
+        </p>
+        <p className="text-[9px] text-slate-400 font-mono tracking-wider mt-0.5">
+          Faster Justice.
+        </p>
+
         <div className="mt-3 flex items-center justify-between border-t border-slate-800/60 pt-2 text-[9px] font-mono tracking-wider text-slate-400">
           <span>NCRB &bull; MHA INDIA</span>
           <span className="text-slate-500">SEC-65B BSA</span>
