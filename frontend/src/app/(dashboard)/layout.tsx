@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-[#F7F9FC] text-slate-900 flex flex-col antialiased relative">
       {/* Ambient Watermark Background for Enterprise Command Center */}
       <div
-        className="fixed inset-0 bg-center bg-no-repeat bg-contain opacity-[0.048] pointer-events-none select-none z-0 filter drop-shadow-xl"
+        className="fixed inset-0 bg-center bg-no-repeat bg-contain opacity-[0.065] pointer-events-none select-none z-0 filter drop-shadow-xl scale-95"
         style={{ backgroundImage: "url('/images/docshield-shield.png')" }}
       />
 

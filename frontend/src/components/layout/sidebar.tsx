@@ -58,7 +58,7 @@ export function Sidebar() {
       {/* Brand Header - Shield Above DOCS SHIELD */}
       <div className="flex flex-col border-b border-slate-800/80 px-5 py-5 bg-[#081426] text-center">
         <div className="mx-auto mb-2 flex items-center justify-center">
-          <div className="relative h-14 w-14 drop-shadow-[0_4px_14px_rgba(37,99,235,0.45)] hover:scale-105 transition-transform duration-200">
+          <div className="relative h-14 w-14 drop-shadow-[0_4px_16px_rgba(37,99,235,0.5)] hover:scale-105 transition-transform duration-200">
             <Image
               src="/images/docshield-shield.png"
               alt="DocShield Emblem"
@@ -71,8 +71,9 @@ export function Sidebar() {
         </div>
         
         <div className="flex items-center justify-center gap-1.5">
-          <h1 className="text-base font-extrabold tracking-tight text-white uppercase font-sans">
-            DOCS SHIELD
+          <h1 className="text-base font-black tracking-tight uppercase font-sans">
+            <span className="text-white">DOCS</span>
+            <span className="text-blue-500">SHIELD</span>
           </h1>
           <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-blue-950/80 border border-blue-800/60 text-[8px] font-mono font-medium text-blue-300">
             <Lock className="h-2 w-2" /> OFFICIAL

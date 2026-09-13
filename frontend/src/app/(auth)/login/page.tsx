@@ -44,12 +44,12 @@ export default function LoginPage() {
     <div className="min-h-screen w-full bg-[#081426] flex flex-col justify-between p-4 sm:p-6 text-white relative overflow-hidden selection:bg-blue-600 selection:text-white">
       {/* Prominent Ambient Watermark Background Graphic */}
       <div 
-        className="absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.16] pointer-events-none filter drop-shadow-2xl scale-110"
+        className="absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.22] sm:opacity-[0.26] pointer-events-none filter drop-shadow-2xl scale-110"
         style={{ backgroundImage: "url('/images/docshield-bg.png')" }}
       />
       {/* Ambient Gradient Highlights */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/25 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/25 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Bar / Official Tag */}
       <div className="w-full flex items-center justify-between max-w-md mx-auto pt-2 z-10">
@@ -64,10 +64,10 @@ export default function LoginPage() {
 
       {/* Main Center Auth Container */}
       <div className="w-full max-w-sm mx-auto my-auto py-6 z-10">
-        {/* Logo & Brand Header - Shield Aligned Above DOCS SHIELD */}
+        {/* Logo & Brand Header - Shield Aligned Above DOCSSHIELD */}
         <div className="text-center mb-6">
           <div className="mx-auto mb-3 flex items-center justify-center">
-            <div className="relative h-24 w-24 drop-shadow-[0_10px_25px_rgba(37,99,235,0.45)] hover:scale-105 transition-transform duration-300">
+            <div className="relative h-24 w-24 drop-shadow-[0_12px_28px_rgba(37,99,235,0.5)] hover:scale-105 transition-transform duration-300">
               <Image
                 src="/images/docshield-shield.png"
                 alt="DocShield Emblem"
@@ -78,8 +78,9 @@ export default function LoginPage() {
               />
             </div>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase font-sans drop-shadow-sm">
-            DOCS SHIELD
+          <h1 className="text-2xl font-black tracking-tight uppercase font-sans drop-shadow-sm">
+            <span className="text-white">DOCS</span>
+            <span className="text-blue-500">SHIELD</span>
           </h1>
           <p className="text-xs text-slate-300 font-medium mt-0.5">
             Secure Evidence. Trusted Records.
