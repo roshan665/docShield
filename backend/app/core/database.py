@@ -17,15 +17,38 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
+def create_application_engine():
+    db_uri = settings.SQLALCHEMY_DATABASE_URI
+    try:
+        if db_uri.startswith("sqlite"):
+            return create_async_engine(
+                db_uri,
+                echo=settings.DEBUG,
+                future=True,
+                connect_args={"check_same_thread": False},
+            )
+        return create_async_engine(
+            db_uri,
+            echo=settings.DEBUG,
+            future=True,
+            pool_size=10,
+            max_overflow=20,
+            pool_pre_ping=True,
+        )
+    except Exception as exc:
+        logger.warning(
+            f"Failed to create primary database engine with URI ({db_uri}): {exc}. Falling back to async SQLite."
+        )
+        return create_async_engine(
+            "sqlite+aiosqlite:///./docshield_fallback.db",
+            echo=settings.DEBUG,
+            future=True,
+            connect_args={"check_same_thread": False},
+        )
+
+
 # Create async engine with robust connection pooling
-engine = create_async_engine(
-    settings.SQLALCHEMY_DATABASE_URI,
-    echo=settings.DEBUG,
-    future=True,
-    pool_size=10,
-    max_overflow=20,
-    pool_pre_ping=True,
-)
+engine = create_application_engine()
 
 # Async session factory
 AsyncSessionLocal = async_sessionmaker(

@@ -105,34 +105,56 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         """Async connection string for SQLAlchemy asyncpg engine"""
-        if self.DATABASE_URL:
-            url = self.DATABASE_URL
+        url = (self.DATABASE_URL or "").strip()
+        if url:
             if url.startswith("postgres://"):
-                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+                url = "postgresql+asyncpg://" + url[len("postgres://"):]
             elif url.startswith("postgresql://"):
-                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                url = "postgresql+asyncpg://" + url[len("postgresql://"):]
+            elif url.startswith("postgresql+psycopg://"):
+                url = "postgresql+asyncpg://" + url[len("postgresql+psycopg://"):]
+            elif url.startswith("postgresql+psycopg2://"):
+                url = "postgresql+asyncpg://" + url[len("postgresql+psycopg2://"):]
+            
+            # Clean up sslmode parameter for asyncpg compatibility
+            if "?sslmode=require" in url:
+                url = url.replace("?sslmode=require", "?ssl=require")
+            elif "&sslmode=require" in url:
+                url = url.replace("&sslmode=require", "&ssl=require")
+            elif "?sslmode=disable" in url:
+                url = url.replace("?sslmode=disable", "")
+            elif "&sslmode=disable" in url:
+                url = url.replace("&sslmode=disable", "")
             return url
-        return (
-            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-        )
+
+        if self.POSTGRES_SERVER and self.POSTGRES_SERVER != "localhost":
+            return (
+                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
+                f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            )
+        
+        # Safe fallback for cloud deployments without an active PostgreSQL service
+        return "sqlite+aiosqlite:///./docshield.db"
 
     @property
     def SQLALCHEMY_SYNC_DATABASE_URI(self) -> str:
         """Sync connection string for Alembic migrations"""
-        if self.DATABASE_URL:
-            url = self.DATABASE_URL
+        url = (self.DATABASE_URL or "").strip()
+        if url:
             if url.startswith("postgres://"):
-                url = url.replace("postgres://", "postgresql+psycopg://", 1)
+                url = "postgresql+psycopg://" + url[len("postgres://"):]
             elif url.startswith("postgresql://"):
-                url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+                url = "postgresql+psycopg://" + url[len("postgresql://"):]
             elif url.startswith("postgresql+asyncpg://"):
-                url = url.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+                url = "postgresql+psycopg://" + url[len("postgresql+asyncpg://"):]
             return url
-        return (
-            f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-        )
+
+        if self.POSTGRES_SERVER and self.POSTGRES_SERVER != "localhost":
+            return (
+                f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
+                f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            )
+        return "sqlite:///./docshield.db"
 
     @property
     def REDIS_URL(self) -> str:
