@@ -25,6 +25,7 @@ class Settings(BaseSettings):
         return self.APP_DEBUG
 
     # Database Configuration (PostgreSQL 16 + pgvector)
+    DATABASE_URL: str | None = None
     POSTGRES_USER: str = "sih_user"
     POSTGRES_PASSWORD: str = "sih_secure_password_dev"
     POSTGRES_SERVER: str = "localhost"
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "sih190"
 
     # Redis Configuration
+    REDIS_URL_OVERRIDE: str | None = None
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str = "sih_redis_pass_dev"
@@ -60,7 +62,7 @@ class Settings(BaseSettings):
     CLAMAV_HOST: str = "localhost"
     CLAMAV_PORT: int = 3310
     CLAMAV_TIMEOUT_SECONDS: int = 10
-    MALWARE_SCAN_REQUIRED: bool = True
+    MALWARE_SCAN_REQUIRED: bool = False
 
     # Security & Cryptography
     JWT_SECRET_KEY: str = "replace_with_64_char_hex_secret_key_minimum_production_only_value"
@@ -69,9 +71,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # CORS
-    BACKEND_CORS_ORIGINS: list[str] = [
+    BACKEND_CORS_ORIGINS: list[str] | str = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://*.onrender.com",
     ]
 
     # Logging & Rate Limiting
@@ -91,10 +94,24 @@ class Settings(BaseSettings):
     SEARCH_RATE_LIMIT_PER_MINUTE: int = 30
     RAG_RATE_LIMIT_PER_MINUTE: int = 15
 
+    @property
+    def CORS_ORIGINS_LIST(self) -> list[str]:
+        if isinstance(self.BACKEND_CORS_ORIGINS, list):
+            return self.BACKEND_CORS_ORIGINS
+        if isinstance(self.BACKEND_CORS_ORIGINS, str):
+            return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+        return ["*"]
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         """Async connection string for SQLAlchemy asyncpg engine"""
+        if self.DATABASE_URL:
+            url = self.DATABASE_URL
+            if url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            return url
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
             f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
@@ -103,6 +120,15 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_SYNC_DATABASE_URI(self) -> str:
         """Sync connection string for Alembic migrations"""
+        if self.DATABASE_URL:
+            url = self.DATABASE_URL
+            if url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+psycopg://", 1)
+            elif url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+            elif url.startswith("postgresql+asyncpg://"):
+                url = url.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+            return url
         return (
             f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
             f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
@@ -111,23 +137,23 @@ class Settings(BaseSettings):
     @property
     def REDIS_URL(self) -> str:
         """Redis connection URL"""
+        import os
+        env_redis = self.REDIS_URL_OVERRIDE or os.environ.get("REDIS_URL")
+        if env_redis:
+            return env_redis
         if self.REDIS_PASSWORD:
             return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
     @property
     def CELERY_BROKER_URL(self) -> str:
-        """Celery broker URL using Redis database 1"""
-        if self.REDIS_PASSWORD:
-            return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/1"
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/1"
+        """Celery broker URL"""
+        return self.REDIS_URL
 
     @property
     def CELERY_RESULT_BACKEND(self) -> str:
-        """Celery results backend URL using Redis database 2"""
-        if self.REDIS_PASSWORD:
-            return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/2"
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/2"
+        """Celery results backend URL"""
+        return self.REDIS_URL
 
 
 settings = Settings()

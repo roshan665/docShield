@@ -49,14 +49,14 @@ app = FastAPI(
 register_exception_handlers(app)
 
 # 2. CORS Middleware
-if settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS_LIST,
+    allow_origin_regex=r"https://.*\.onrender\.com",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 3. Security Headers, Request ID & Access Audit Middleware
 app.add_middleware(SecurityHeadersMiddleware)
