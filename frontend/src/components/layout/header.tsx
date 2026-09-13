@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Bell, Lock, UserCheck, LogOut, LogIn, Menu, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -38,9 +39,15 @@ export function Header({ onOpenMobileDrawer }: HeaderProps) {
       </div>
 
       {/* Mobile Center Branding (visible only on mobile/tablet) */}
-      <div className="flex items-center gap-2 lg:hidden">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm ring-1 ring-blue-400/30">
-          <Shield className="h-5 w-5" />
+      <div className="flex items-center gap-2.5 lg:hidden">
+        <div className="relative h-8 w-8 rounded-lg p-0.5 bg-gradient-to-b from-blue-500/20 to-blue-900/30 ring-1 ring-blue-400/30 shadow-sm">
+          <Image
+            src="/images/docshield-logo.png"
+            alt="DocShield Emblem"
+            fill
+            sizes="32px"
+            className="object-contain rounded-md"
+          />
         </div>
         <span className="text-sm font-bold tracking-tight text-slate-950 uppercase font-sans">
           DOCS<span className="text-blue-600 font-extrabold">SHIELD</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -16,6 +17,7 @@ import {
   Lock,
   ChevronRight,
   LogOut,
+  ShieldCheck,
   UserCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,8 +89,14 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-4 bg-[#081426]">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md ring-1 ring-blue-400/30">
-              <Shield className="h-6 w-6" />
+            <div className="relative h-10 w-10 shrink-0 rounded-xl bg-gradient-to-b from-blue-500/20 to-blue-900/30 p-0.5 ring-1 ring-blue-400/30 shadow-md">
+              <Image
+                src="/images/docshield-logo.png"
+                alt="DocShield Emblem"
+                fill
+                sizes="40px"
+                className="object-contain rounded-lg"
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5">

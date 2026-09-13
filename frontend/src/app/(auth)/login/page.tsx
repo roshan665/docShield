@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Shield, Lock, ArrowRight, AlertCircle, Loader2, KeyRound, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,12 +42,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#081426] flex flex-col justify-between p-4 sm:p-6 text-white relative overflow-hidden selection:bg-blue-600 selection:text-white">
+      {/* Ambient Watermark Background Graphic */}
+      <div 
+        className="absolute inset-0 bg-center bg-no-repeat bg-cover opacity-[0.06] mix-blend-luminosity pointer-events-none filter blur-[1px] scale-105"
+        style={{ backgroundImage: "url('/images/docshield-bg.jpg')" }}
+      />
       {/* Subtle Background Glow Accent */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Bar / Official Tag */}
-      <div className="w-full flex items-center justify-between max-w-md mx-auto pt-2">
+      <div className="w-full flex items-center justify-between max-w-md mx-auto pt-2 z-10">
         <Badge
           variant="outline"
           className="gap-1.5 border-blue-800/80 bg-blue-950/80 text-blue-300 font-mono text-[10px] uppercase font-semibold"
@@ -57,16 +63,25 @@ export default function LoginPage() {
       </div>
 
       {/* Main Center Auth Container */}
-      <div className="w-full max-w-sm mx-auto my-auto py-8">
+      <div className="w-full max-w-sm mx-auto my-auto py-8 z-10">
         {/* Logo & Brand Header */}
         <div className="text-center mb-6">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/30 ring-1 ring-blue-400/40">
-            <Shield className="h-9 w-9 text-white" />
+          <div className="mx-auto mb-3 flex items-center justify-center">
+            <div className="relative h-20 w-20 rounded-2xl p-1 bg-gradient-to-b from-blue-500/30 to-blue-900/40 ring-1 ring-blue-400/40 shadow-2xl shadow-blue-600/30">
+              <Image
+                src="/images/docshield-logo.png"
+                alt="DocShield Logo"
+                fill
+                sizes="80px"
+                className="object-contain rounded-xl"
+                priority
+              />
+            </div>
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase font-sans">
             DOCS SHIELD
           </h1>
-          <p className="text-xs text-slate-300 font-medium mt-1">
+          <p className="text-xs text-slate-300 font-medium mt-0.5">
             Secure Evidence. Trusted Records.
           </p>
           <p className="text-[11px] text-blue-400 font-mono tracking-wide mt-0.5">
