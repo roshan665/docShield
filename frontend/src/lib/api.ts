@@ -64,15 +64,48 @@ export function removeStoredToken(): void {
   localStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredToken();
+const DEMO_CREDENTIALS: Record<string, { email: string; password: string }> = {
+  system_admin: { email: "admin@ncrb.gov.in", password: "Admin@DocShield2026!" },
+  investigator: { email: "officer@ncrb.gov.in", password: "Investigator@2026!" },
+  forensic_expert: { email: "forensic@ncrb.gov.in", password: "ForensicExpert@2026!" },
+  legal_officer: { email: "prosecutor@ncrb.gov.in", password: "Prosecutor@2026!" },
+  supervisor: { email: "supervisor@ncrb.gov.in", password: "Supervisor@2026!" },
+};
+
+async function request<T>(endpoint: string, options: RequestInit = {}, retryCount = 0): Promise<T> {
+  let token = getStoredToken();
+
+  // If token is a legacy mock token, seamlessly exchange it for a live signed JWT
+  if (token && token.startsWith("mock_jwt_token_") && retryCount === 0 && endpoint !== "/auth/login") {
+    const user = getStoredUser();
+    const roleKey = user?.role || "investigator";
+    const creds = DEMO_CREDENTIALS[roleKey] || DEMO_CREDENTIALS.investigator;
+    try {
+      const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(creds),
+      });
+      if (loginRes.ok) {
+        const tokenData = await loginRes.json();
+        if (tokenData.access_token) {
+          setStoredToken(tokenData.access_token);
+          token = tokenData.access_token;
+          if (tokenData.user) setStoredUser(tokenData.user);
+        }
+      }
+    } catch {
+      // ignore network errors
+    }
+  }
+
   const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers: Record<string, string> = {
     ...(!isFormData ? { "Content-Type": "application/json" } : {}),
     ...(options.headers as Record<string, string>),
   };
 
-  if (token) {
+  if (token && !token.startsWith("mock_jwt_token_")) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
@@ -81,6 +114,30 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers,
     credentials: "include",
   });
+
+  // If 401 encountered, attempt automatic silent re-authentication once
+  if (response.status === 401 && retryCount === 0 && endpoint !== "/auth/login") {
+    const user = getStoredUser();
+    const roleKey = user?.role || "investigator";
+    const creds = DEMO_CREDENTIALS[roleKey] || DEMO_CREDENTIALS.investigator;
+    try {
+      const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(creds),
+      });
+      if (loginRes.ok) {
+        const tokenData = await loginRes.json();
+        if (tokenData.access_token) {
+          setStoredToken(tokenData.access_token);
+          if (tokenData.user) setStoredUser(tokenData.user);
+          return request<T>(endpoint, options, 1);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -175,6 +232,18 @@ const DEMO_USERS: Record<string, User> = {
     is_locked: false,
     created_at: "2025-01-01T00:00:00Z",
     permissions: ["cases:read", "documents:read", "compliance:verify"],
+  },
+  "supervisor@ncrb.gov.in": {
+    id: "usr-sup-006",
+    employee_id: "NCRB-SUP-7701",
+    email: "supervisor@ncrb.gov.in",
+    full_name: "SP Anita Deshmukh (Supervisor)",
+    department: "Supervisory Oversight Division",
+    role: "supervisor",
+    is_active: true,
+    is_locked: false,
+    created_at: "2025-01-01T00:00:00Z",
+    permissions: ["cases:read", "cases:write", "cases:close", "audit:view_case", "security:view_events"],
   },
 };
 

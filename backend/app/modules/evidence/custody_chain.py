@@ -24,7 +24,13 @@ def canonicalize_custody_event(
     """
     Produces deterministic canonical UTF-8 bytes for an evidence custody event.
     """
-    ts_str = timestamp.isoformat() if isinstance(timestamp, datetime) else str(timestamp)
+    from datetime import UTC
+    if isinstance(timestamp, datetime):
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=UTC)
+        ts_str = timestamp.isoformat()
+    else:
+        ts_str = str(timestamp)
     payload = {
         "evidence_id": str(evidence_id),
         "event_type": str(event_type),

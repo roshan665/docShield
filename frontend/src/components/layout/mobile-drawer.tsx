@@ -102,7 +102,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             <div>
               <div className="flex items-center gap-1.5">
                 <h2 className="text-base font-black tracking-tight uppercase font-sans">
-                  <span className="text-white">DOCS</span>
+                  <span className="text-white">DOC</span>
                   <span className="text-blue-500">SHIELD</span>
                 </h2>
               </div>

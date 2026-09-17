@@ -27,6 +27,12 @@ def create_application_engine():
                 future=True,
                 connect_args={"check_same_thread": False},
             )
+        connect_args = {}
+        if "supabase.co" in db_uri or "pooler.supabase.com" in db_uri or ":6543" in db_uri:
+            # Supabase connection poolers require disabled prepared statement cache for transaction mode
+            connect_args["prepared_statement_cache_size"] = 0
+            connect_args["statement_cache_size"] = 0
+
         return create_async_engine(
             db_uri,
             echo=settings.DEBUG,
@@ -34,6 +40,7 @@ def create_application_engine():
             pool_size=10,
             max_overflow=20,
             pool_pre_ping=True,
+            connect_args=connect_args,
         )
     except Exception as exc:
         logger.warning(
@@ -83,11 +90,13 @@ async def check_database_health() -> bool:
             if val != 1:
                 return False
 
-            # Check if pgvector extension is available or installed
-            ext_check = await session.execute(
-                text("SELECT count(*) FROM pg_extension WHERE extname = 'vector'")
-            )
-            return ext_check.scalar() is not None
+            # If running PostgreSQL, verify pgvector extension
+            if session.bind and getattr(session.bind.dialect, "name", "") == "postgresql":
+                ext_check = await session.execute(
+                    text("SELECT count(*) FROM pg_extension WHERE extname = 'vector'")
+                )
+                return ext_check.scalar() is not None
+            return True
     except Exception as e:
         logger.warning(f"Database health check failed: {str(e)}")
         return False

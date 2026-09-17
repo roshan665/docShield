@@ -72,7 +72,7 @@ export function Sidebar() {
         
         <div className="flex items-center justify-center gap-1.5">
           <h1 className="text-base font-black tracking-tight uppercase font-sans">
-            <span className="text-white">DOCS</span>
+            <span className="text-white">DOC</span>
             <span className="text-blue-500">SHIELD</span>
           </h1>
           <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-blue-950/80 border border-blue-800/60 text-[8px] font-mono font-medium text-blue-300">

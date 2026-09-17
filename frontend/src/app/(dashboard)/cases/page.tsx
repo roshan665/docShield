@@ -99,6 +99,7 @@ export default function CasesPage() {
   // Create Case Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState<CaseCreateRequest>({
+    case_number: "",
     title: "",
     description: "",
     priority: "medium",
@@ -221,10 +222,12 @@ export default function CasesPage() {
     try {
       const newCase = await createCase({
         ...createForm,
+        case_number: createForm.case_number?.trim() || undefined,
         incident_date: createForm.incident_date ? new Date(createForm.incident_date).toISOString() : undefined,
       });
       setShowCreateModal(false);
       setCreateForm({
+        case_number: "",
         title: "",
         description: "",
         priority: "medium",
@@ -1173,12 +1176,37 @@ export default function CasesPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Case Number <span className="text-slate-400 font-normal">(Optional)</span>
+                  </label>
+                  <Input
+                    placeholder="Auto-assigned if empty (e.g. NCRB-2026-...)"
+                    value={createForm.case_number || ""}
+                    onChange={(e) => setCreateForm({ ...createForm, case_number: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
                     FIR Number
                   </label>
                   <Input
                     placeholder="e.g. FIR-2026/089"
                     value={createForm.fir_number}
                     onChange={(e) => setCreateForm({ ...createForm, fir_number: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Police Station
+                  </label>
+                  <Input
+                    placeholder="e.g. Cyber Crime PS, New Delhi"
+                    value={createForm.police_station}
+                    onChange={(e) => setCreateForm({ ...createForm, police_station: e.target.value })}
                     className="text-xs"
                   />
                 </div>
@@ -1196,20 +1224,6 @@ export default function CasesPage() {
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                   </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Police Station / Jurisdiction
-                  </label>
-                  <Input
-                    placeholder="e.g. Cyber Crime PS, New Delhi"
-                    value={createForm.police_station}
-                    onChange={(e) => setCreateForm({ ...createForm, police_station: e.target.value })}
-                    className="text-xs"
-                  />
                 </div>
                 <div>
                   <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">

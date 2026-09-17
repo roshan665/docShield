@@ -937,7 +937,7 @@ export default function SettingsPage() {
 
       {/* Footer Branding (Reference Panel 8) */}
       <div className="text-center py-4 text-xs font-mono text-slate-400">
-        DOCS SHIELD v2.1.0 &bull; National Evidence Platform
+        DOCSHIELD v2.1.0 &bull; National Evidence Platform
       </div>
     </div>
   );

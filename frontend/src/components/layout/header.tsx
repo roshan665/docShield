@@ -51,7 +51,7 @@ export function Header({ onOpenMobileDrawer }: HeaderProps) {
           />
         </div>
         <span className="text-sm font-extrabold tracking-tight text-slate-950 uppercase font-sans">
-          DOCS<span className="text-blue-600 font-extrabold">SHIELD</span>
+          DOC<span className="text-blue-600 font-extrabold">SHIELD</span>
         </span>
       </div>
 

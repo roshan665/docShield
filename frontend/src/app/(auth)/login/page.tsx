@@ -79,7 +79,7 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-2xl font-black tracking-tight uppercase font-sans drop-shadow-sm">
-            <span className="text-white">DOCS</span>
+            <span className="text-white">DOC</span>
             <span className="text-blue-500">SHIELD</span>
           </h1>
           <p className="text-xs text-slate-300 font-medium mt-0.5">
@@ -251,6 +251,28 @@ export default function LoginPage() {
                     <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition" />
                   </div>
                   <div className="text-[10px] text-slate-400 truncate font-mono">prosecutor@ncrb.gov.in</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    fillCredentials("supervisor@ncrb.gov.in", "Supervisor@2026!");
+                    setIsSubmitting(true);
+                    try {
+                      await login({ email: "supervisor@ncrb.gov.in", password: "Supervisor@2026!" });
+                    } catch (e: any) {
+                      setError(e?.message || "Sign in failed");
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  className="col-span-2 rounded-lg border border-slate-700/80 bg-slate-800/80 p-2 text-left text-[11px] text-slate-200 hover:bg-slate-700/90 hover:border-cyan-500 transition shadow-sm group"
+                >
+                  <div className="font-semibold text-cyan-400 flex items-center justify-between">
+                    <span>Supervisor (SP Oversight)</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition" />
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate font-mono">supervisor@ncrb.gov.in</div>
                 </button>
               </div>
             </div>

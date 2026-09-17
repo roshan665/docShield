@@ -49,7 +49,7 @@ class AuditService:
             "resource_id": str(resource_id) if resource_id else None,
             "resource_type": resource_type,
             "result": result,
-            "timestamp": timestamp.isoformat(),
+            "timestamp": (timestamp.replace(tzinfo=UTC) if isinstance(timestamp, datetime) and timestamp.tzinfo is None else timestamp).isoformat() if isinstance(timestamp, datetime) else str(timestamp),
         }
         canonical_str = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
         hash_input = f"{canonical_str}|{previous_event_hash}".encode()
@@ -72,8 +72,10 @@ class AuditService:
         Atomically acquires a PostgreSQL transactional advisory lock, fetches the latest
         event hash, calculates the SHA-256 chain hash, and inserts the audit record.
         """
-        # 1. Acquire transaction advisory lock to strictly serialize sequential hash chaining
-        await self.session.execute(text("SELECT pg_advisory_xact_lock(hashtext('audit_chain_lock'))"))
+        # 1. Acquire transaction advisory lock to strictly serialize sequential hash chaining (PostgreSQL only)
+        bind = self.session.bind
+        if bind and getattr(bind.dialect, "name", "") == "postgresql":
+            await self.session.execute(text("SELECT pg_advisory_xact_lock(hashtext('audit_chain_lock'))"))
 
         # 2. Query the latest event hash
         latest_query = (

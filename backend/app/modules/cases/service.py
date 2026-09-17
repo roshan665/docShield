@@ -4,6 +4,7 @@ Orchestrates case lifecycle state machine, membership authorization, and audit t
 """
 
 from datetime import UTC, datetime
+import secrets
 from uuid import UUID
 
 from sqlalchemy import select
@@ -61,17 +62,27 @@ class CaseService:
         Registers a new Case and automatically enrolls the creator as lead investigator.
         Emits an append-only audit event.
         """
-        # 1. Uniqueness check
-        existing = await self.case_repo.get_by_case_number(data.case_number)
-        if existing:
-            raise ConflictException(
-                detail=f"Case number '{data.case_number}' already exists",
-                error_code="CASE_002",
-            )
+        # 1. Resolve Case Number (Auto-generate if omitted)
+        case_num = (data.case_number or "").strip()
+        if not case_num:
+            year = datetime.now(UTC).year
+            # Generate official unique NCRB case number
+            case_num = f"NCRB-{year}-CASE-{secrets.randbelow(90000) + 10000}"
+            for _ in range(10):
+                if not await self.case_repo.get_by_case_number(case_num):
+                    break
+                case_num = f"NCRB-{year}-CASE-{secrets.randbelow(90000) + 10000}"
+        else:
+            existing = await self.case_repo.get_by_case_number(case_num)
+            if existing:
+                raise ConflictException(
+                    detail=f"Case number '{case_num}' already exists",
+                    error_code="CASE_002",
+                )
 
         # 2. Create Case entity
         case = Case(
-            case_number=data.case_number,
+            case_number=case_num,
             fir_number=data.fir_number,
             title=data.title,
             description=data.description,

@@ -31,6 +31,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(
         f"Starting {settings.APP_NAME} [env={settings.APP_ENV}, debug={settings.DEBUG}]"
     )
+    try:
+        from app.core.database import engine
+        from app.models.base import Base
+        import app.models  # ensure models are registered
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables initialized successfully.")
+    except Exception as e:
+        logger.warning(f"Startup table initialization note: {e}")
     yield
     logger.info(f"Shutting down {settings.APP_NAME}")
 

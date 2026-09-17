@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class CaseCreateRequest(BaseModel):
-    case_number: str = Field(..., min_length=3, max_length=100, description="Unique case number e.g. CR-2026-001")
+    case_number: str | None = Field(None, max_length=100, description="Optional unique case number e.g. CR-2026-001 (auto-generated if omitted)")
     fir_number: str | None = Field(None, max_length=100, description="Optional FIR reference e.g. FIR-2026-101")
     title: str = Field(..., min_length=3, max_length=500, description="Case title")
     description: str | None = Field(None, description="Detailed case brief")
@@ -19,6 +19,7 @@ class CaseCreateRequest(BaseModel):
     police_station: str | None = Field(None, max_length=255)
     district: str | None = Field(None, max_length=100)
     state: str | None = Field(None, max_length=100)
+    incident_date: str | datetime | None = Field(None, description="Optional incident date/timestamp")
 
 
 class CaseUpdateRequest(BaseModel):

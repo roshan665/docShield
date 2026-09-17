@@ -146,6 +146,7 @@ export interface Case {
 
 export interface CaseCreateRequest {
   title: string;
+  case_number?: string;
   description?: string;
   priority?: CasePriority;
   incident_date?: string;

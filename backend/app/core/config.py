@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "sih190"
 
+    # Supabase Integration
+    SUPABASE_URL: str = "https://iwinomhcofhouapfirjo.supabase.co"
+    SUPABASE_ANON_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
+
     # Redis Configuration
     REDIS_URL_OVERRIDE: str | None = None
     REDIS_HOST: str = "localhost"
