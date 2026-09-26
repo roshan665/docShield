@@ -1,85 +1,51 @@
-"""
-Case Management Pydantic Schemas
-Defines request and response data contracts for Case & Case Membership operations.
-"""
-
 from datetime import datetime
-from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict, Field
-
-
-class CaseCreateRequest(BaseModel):
-    case_number: str | None = Field(None, max_length=100, description="Optional unique case number e.g. CR-2026-001 (auto-generated if omitted)")
-    fir_number: str | None = Field(None, max_length=100, description="Optional FIR reference e.g. FIR-2026-101")
-    title: str = Field(..., min_length=3, max_length=500, description="Case title")
-    description: str | None = Field(None, description="Detailed case brief")
-    priority: str = Field("medium", pattern="^(critical|high|medium|low)$")
-    category: str | None = Field(None, max_length=100)
-    police_station: str | None = Field(None, max_length=255)
-    district: str | None = Field(None, max_length=100)
-    state: str | None = Field(None, max_length=100)
-    incident_date: str | datetime | None = Field(None, description="Optional incident date/timestamp")
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
 
 
-class CaseUpdateRequest(BaseModel):
-    title: str | None = Field(None, min_length=3, max_length=500)
-    description: str | None = None
-    priority: str | None = Field(None, pattern="^(critical|high|medium|low)$")
-    category: str | None = Field(None, max_length=100)
-    police_station: str | None = Field(None, max_length=255)
-    district: str | None = Field(None, max_length=100)
-    state: str | None = Field(None, max_length=100)
-    status: str | None = Field(None, pattern="^(open|under_investigation|pending_review|pending_legal|closed|archived)$")
+class CaseCreate(BaseModel):
+    case_number: Optional[str] = Field(None, description="Statutory case number, e.g. #2024-1801")
+    title: str = Field(default="Investigation Case", description="Title or crime description")
+    section_ipc_bns: str = Field(default="IPC 302 - Homicide", description="Statutory penal code provisions")
+    status: str = Field(default="Active", description="Active, Under Review, Closed, Charge Sheet Filed")
+    priority: str = Field(default="Normal", description="Low, Normal, High, Urgent, Critical")
+    complainant_name: Optional[str] = Field("Direct Police Cognizance", description="Complainant or informant name")
+    police_station: Optional[str] = Field("Bhopal Central Police Station", description="Jurisdictional police station")
+    summary: Optional[str] = Field("Preliminary investigation initialized under IO purview.", description="Case summary")
+    investigating_officer_id: Optional[str] = Field(None, description="Assigned IO profile UUID")
 
 
-class CaseStatusUpdateRequest(BaseModel):
-    status: str = Field(..., pattern="^(open|under_investigation|pending_review|pending_legal|closed|archived)$")
-    reason: str | None = Field(None, description="Reason for status transition")
-
-
-class CaseMemberAddRequest(BaseModel):
-    user_id: UUID
-    role_in_case: str = Field("investigator", pattern="^(lead_investigator|investigator|forensic_analyst|legal_counsel|supervisor|reviewer)$")
-
-
-class CaseMemberResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    case_id: UUID
-    user_id: UUID
-    role_in_case: str
-    added_by: UUID | None = None
-    added_at: datetime
-    is_active: bool
-    user_full_name: str | None = None
-    user_email: str | None = None
-    user_employee_id: str | None = None
-    user_role: str | None = None
+class CaseUpdate(BaseModel):
+    title: Optional[str] = None
+    section_ipc_bns: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    complainant_name: Optional[str] = None
+    police_station: Optional[str] = None
+    summary: Optional[str] = None
+    investigating_officer_id: Optional[str] = None
+    assigned_legal_officer_id: Optional[str] = None
+    assigned_forensic_officer_id: Optional[str] = None
 
 
 class CaseResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
+    id: str
     case_number: str
-    fir_number: str | None = None
     title: str
-    description: str | None = None
+    section_ipc_bns: Optional[str] = None
     status: str
     priority: str
-    category: str | None = None
-    police_station: str | None = None
-    district: str | None = None
-    state: str | None = None
-    investigating_officer_id: UUID | None = None
-    investigating_officer_name: str | None = None
-    created_by: UUID
-    created_by_name: str | None = None
-    closed_at: datetime | None = None
-    created_at: datetime
-    updated_at: datetime | None = None
-    members_count: int = 0
-    user_role_in_case: str | None = None
-
+    complainant_name: Optional[str] = None
+    police_station: Optional[str] = None
+    summary: Optional[str] = None
+    investigating_officer_id: Optional[str] = None
+    assigned_legal_officer_id: Optional[str] = None
+    assigned_forensic_officer_id: Optional[str] = None
+    investigating_officer: Optional[Dict[str, Any]] = None
+    registration_date: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    documents: List[Dict[str, Any]] = Field(default_factory=list)
+    evidence: List[Dict[str, Any]] = Field(default_factory=list)
+    charge_sheets: List[Dict[str, Any]] = Field(default_factory=list)
+    court_filings: List[Dict[str, Any]] = Field(default_factory=list)

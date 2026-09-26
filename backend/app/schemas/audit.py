@@ -1,48 +1,25 @@
-"""
-Audit & Verification Pydantic Schemas
-Contracts for audit log querying and cryptographic chain verification.
-"""
-
 from datetime import datetime
-from typing import Any
-from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
 
 
-class AuditEventResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    actor_id: UUID | None = None
-    actor_name: str | None = None
-    actor_email: str | None = None
-    action: str
-    resource_type: str
-    resource_id: UUID | None = None
-    case_id: UUID | None = None
-    details: dict[str, Any] | None = None
-    result: str
-    ip_address: str | None = None
-    previous_event_hash: str | None = None
-    event_hash: str
-    timestamp: datetime
-
-
-class AuditVerificationResponse(BaseModel):
-    valid: bool
-    events_checked: int
-    first_invalid_event: str | None = None
-    reason: str | None = None
-
-
-class CaseTimelineEventResponse(BaseModel):
-    id: UUID
-    timestamp: datetime
-    action: str
-    actor_name: str | None = None
-    actor_email: str | None = None
+class AuditLogResponse(BaseModel):
+    id: str = Field(..., description="Audit record UUID")
+    timestamp: datetime = Field(..., description="Immutable event timestamp")
+    user_id: Optional[str] = None
+    role: str = Field(default="System", description="System role of actor")
+    action: str = Field(..., description="Action identifier (e.g. EVIDENCE_CREATED)")
+    module: str = Field(..., description="Audit module category")
+    entity_type: str
+    entity_id: Optional[str] = None
+    case_id: Optional[str] = None
+    evidence_id: Optional[str] = None
+    result: str = Field(default="Success", description="'Success', 'Warning', 'Failure'")
     description: str
-    details: dict[str, Any] | None = None
-    result: str
+    record_hash: str = Field(..., description="Cryptographic record seal")
+    event_payload: Dict[str, Any] = Field(default_factory=dict)
 
+
+class AuditLogListResponse(BaseModel):
+    total: int
+    data: List[AuditLogResponse]

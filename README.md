@@ -1,187 +1,145 @@
-# Secure Digital Evidence & Legal Case Lifecycle Management Platform
+# DocShield — Secure Digital Case, Document and Evidence Management Platform
 
-> **Smart India Hackathon 2026 &bull; Problem Statement SIH26190**  
-> **Organization**: Ministry of Home Affairs / National Crime Records Bureau (NCRB) / Women Safety Division  
-> **Theme**: Blockchain & Cybersecurity  
+> **SIH 26190** — Advanced Legal, Forensic, Chain of Custody & Judicial Workflow System conforming to CCTNS, ICJS, and statutory evidentiary requirements under the Indian Evidence Act (IEA) / Bharatiya Sakshya Adhiniyam (BSA) and Code of Criminal Procedure (CrPC) / Bharatiya Nagarik Suraksha Sanhita (BNSS).
 
 ---
 
-## 1. Project Overview
+## 1. Project Setup
 
-A zero-trust, AI-assisted digital evidence lifecycle platform where every sensitive legal and investigation document is searchable, access-controlled, cryptographically verifiable, version-controlled, and traceable from creation to court submission.
+DocShield is built with React 19, Vite 8, Vanilla CSS design tokens, and the official Supabase JavaScript SDK (`@supabase/supabase-js`).
 
-### Core Architectural Principles
-- **Zero-Trust Security**: Continuous authentication and case-membership verification on every resource access.
-- **Cryptographic File Integrity**: Permanent SHA-256 baseline hashing on ingest with live tamper detection.
-- **Tamper-Evident Ledger**: Hash-chained, append-only audit trail and chain of custody.
-- **AI Document Intelligence**: Automated OCR, legal classification, entity extraction, and authorized RAG case assistant.
+### Prerequisites
+- Node.js >= 20.0.0
+- npm >= 10.0.0
 
----
-
-## 2. Monorepo Structure
-
-```
-SIH-190/
-├── backend/                  # Python FastAPI application
-│   ├── app/
-│   │   ├── api/v1/           # API routes & endpoints
-│   │   ├── core/             # Config, security, database, logging, middleware
-│   │   ├── models/           # SQLAlchemy ORM models & mixins
-│   │   ├── schemas/          # Pydantic request/response schemas
-│   │   ├── storage/          # S3/MinIO abstraction service
-│   │   └── workers/          # Celery background queue & tasks
-│   ├── alembic/              # Database migrations & pgvector setup
-│   ├── tests/                # Pytest unit & security test suite
-│   ├── pyproject.toml        # Ruff, mypy, & pytest configurations
-│   └── requirements.txt      # Production backend dependencies
-├── frontend/                 # Next.js 14 App Router application
-│   ├── src/
-│   │   ├── app/              # App Router routes ((auth), (dashboard))
-│   │   ├── components/       # Reusable UI & layout components
-│   │   ├── lib/              # API client & utilities
-│   │   └── types/            # TypeScript definitions
-│   ├── package.json          # Node dependencies
-│   └── tailwind.config.ts    # Tailwind styling system
-├── infrastructure/           # Docker Compose for local development
-│   ├── docker-compose.yml    # PostgreSQL (pgvector), Redis, MinIO
-│   └── init-pgvector.sql     # Database extensions bootstrap
-├── scripts/                  # Automation & verification scripts
-│   ├── start_infra.sh        # Start docker infrastructure
-│   └── stop_infra.sh         # Stop docker infrastructure
-└── docs/                     # Architectural source of truth (Locked)
-    ├── ARCHITECTURE.md
-    ├── SECURITY_MODEL.md
-    ├── DATABASE_DESIGN.md
-    ├── API_SPEC.md
-    ├── AI_PIPELINE.md
-    ├── DEVELOPMENT_RULES.md
-    └── IMPLEMENTATION_ROADMAP.md
+### Installation
+```bash
+git clone <repository-url>
+cd love_you
+npm install
 ```
 
 ---
 
-## 3. Prerequisites
+## 2. Environment Variables Required
 
-- **Node.js**: >= 20.0 (v24.x tested)
-- **Python**: >= 3.12 (v3.14.x tested)
-- **Docker & Docker Compose**: >= 24.0
-
----
-
-## 4. Environment Setup
-
-Copy the environment templates before starting:
+Create a `.env` file in the project root based on `.env.example`:
 
 ```bash
-# Root template
 cp .env.example .env
-
-# Backend configuration
-cp backend/.env.example backend/.env
-
-# Frontend configuration
-cp frontend/.env.example frontend/.env.local
 ```
 
-> **Security Note**: Never commit `.env` files or secret keys into version control.
+Define the public client-safe Supabase configuration:
+
+```env
+# DocShield Client Environment Configuration
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-publishable-key
+```
+
+> **Security Rule:** Never include or expose `SUPABASE_SERVICE_ROLE_KEY`, database superuser credentials, or backend API secrets in frontend environment files or client bundles.
 
 ---
 
-## 5. Local Infrastructure Startup
+## 3. Supabase Configuration
 
-Start the required local backing services (PostgreSQL 16 with pgvector, Redis 7, and MinIO S3):
+DocShield utilizes Supabase PostgreSQL with Row Level Security (RLS) enabled across all public tables, cryptographic extensions (`uuid-ossp`, `pgcrypto`), and private Supabase Storage buckets.
 
-```bash
-./scripts/start_infra.sh
-```
-
-Service endpoints:
-- **PostgreSQL**: `localhost:5432` (database: `sih190`)
-- **Redis**: `localhost:6379`
-- **MinIO S3 API**: `http://localhost:9000`
-- **MinIO Web Console**: `http://localhost:9001` (user: `minio_admin`)
-
-To stop infrastructure:
-```bash
-./scripts/stop_infra.sh
-```
+### Key Connection File
+[`src/lib/supabaseClient.js`](file:///d:/msi/love_you/src/lib/supabaseClient.js) configures the centralized client singleton with automatic token refresh, session persistence, and zero-leakage anonymous authorization.
 
 ---
 
-## 6. Backend Startup
+## 4. Database Migration Status
 
-1. **Set up virtual environment & install dependencies**:
-   ```bash
-   cd backend
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements-dev.txt
-   ```
+Database migrations are located in [`supabase/migrations/`](file:///d:/msi/love_you/supabase/migrations/):
 
-2. **Run database migrations**:
-   ```bash
-   alembic upgrade head
-   ```
-
-3. **Start the FastAPI development server**:
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-4. **Start the Celery worker** (optional for test tasks):
-   ```bash
-   celery -A app.workers.celery_app.celery_app worker --loglevel=info
-   ```
-
-Interactive API documentation will be accessible at `http://localhost:8000/docs`.
+1. **`20240923000000_docshield_complete_schema.sql`**: Full schema creation including custom ENUMs, 10 primary tables (`profiles`, `cases`, `documents`, `evidence`, `forensic_reports`, `charge_sheets`, `court_filings`, `chain_of_custody_transfers`, `audit_logs`), performance indexes, immutability triggers, and Row Level Security policies.
+2. **`20240924000000_fix_auth_trigger_search_path.sql`**: Hardens the `handle_new_user()` trigger on `auth.users` with explicit `SET search_path = public, auth`, fully qualified `public.app_role` casting, and conflict resolution.
 
 ---
 
-## 7. Frontend Startup
+## 5. Authentication Setup
 
-1. **Install dependencies**:
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-2. **Start the Next.js development server**:
-   ```bash
-   npm run dev
-   ```
-
-Access the application in your browser at `http://localhost:3000`.
+- **Provider:** Supabase Auth (Email + Secure Passcode / Session JWTs).
+- **Session Persistence:** Authenticated sessions persist across page reloads via token storage.
+- **Verification Persona Presets:** For evaluation and role testing, pre-configured officer personas can be selected directly on the login modal to test specific role permissions.
 
 ---
 
-## 8. Running Tests & Quality Checks
+## 6. Role Definitions & Access Boundaries
 
-### Backend Quality Suite
+| Role | Canonical Identifier | Core Responsibilities & Permissions | Restricted Modules |
+| :--- | :--- | :--- | :--- |
+| **System Administrator** | `admin` | Full administrative oversight, officer provisioning, global settings, audit monitoring. | None |
+| **Police Inspector** | `inspector` | Station House Officer; FIR registration, Panchnama documentation, field evidence seizure, custody initiation. | Users, Settings, Admin Dashboard |
+| **Legal Officer / Prosecutor** | `legal_officer` | Public Prosecutor; legal scrutiny, Section 173 CrPC charge sheet review, court filings submission. | Users, Settings, Admin Dashboard |
+| **Forensic Officer** | `forensic_officer` | Senior Scientific Officer; laboratory intake, evidence examination, report drafting (Form IV Sec 45 IEA), chain of custody transfer chaining. | Charge Sheets, Court Filings, Users, Settings, Admin Dashboard |
+
+---
+
+## 7. Storage Configuration
+
+DocShield employs private Supabase Storage buckets configured with `public = false`:
+
+- `case-documents`: Case dockets, FIR records, Panchnama memos.
+- `evidence-vault`: Seized exhibits, photographs, audio/video recordings.
+- `forensic-reports`: Certified laboratory analysis certificates.
+- `court-filings`: Certified judicial submissions and bail responses.
+
+### Retrieval Security
+- Permanent public URLs are strictly forbidden.
+- Retrieval generates short-lived (60-second) cryptographically signed URLs (`storageService.getSecureSignedUrl`).
+- Uploads enforce a 50 MB threshold and permitted MIME type verification (`application/pdf`, `image/*`, `audio/*`, `video/mp4`).
+
+---
+
+## 8. Development Command
+
+To start the Vite development server with hot module replacement (HMR):
+
 ```bash
-cd backend
-source .venv/bin/activate
-
-# Run test suite
-pytest -v
-
-# Run linting
-ruff check .
+npm run dev
 ```
 
-### Frontend Quality Suite
+Default local URL: `http://localhost:5173/`
+
+---
+
+## 9. Production Build & Preview Commands
+
+To create an optimized production bundle:
+
 ```bash
-cd frontend
-
-# Run linting
-npm run lint
-
-# Run production build
 npm run build
 ```
 
+To preview the built production bundle locally:
+
+```bash
+npm run preview
+```
+
+To run the automated verification test suite:
+
+```bash
+npm test
+```
+
 ---
 
-## 9. Health & Diagnostic Probes
+## 10. Deployment Requirements
 
-- **Liveness Probe**: `GET http://localhost:8000/health`
-- **Readiness Probe**: `GET http://localhost:8000/health/ready` (checks DB, Redis, MinIO, and Celery)
+### Static SPA Hosting (Vercel, Netlify, Cloudflare Pages, AWS S3 + CloudFront)
+- **Build Command:** `npm run build`
+- **Publish Directory:** `dist`
+- **SPA Rewrites:** All routes rewrite to `/index.html`. Pre-configured via `vercel.json` and `public/_redirects`.
+- **Environment Variables:** Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting dashboard.
+
+---
+
+## 11. Security Notes
+
+1. **Append-Only Immutability:** Audit logs and chain-of-custody transfers are immutable. PostgreSQL triggers (`prevent_audit_tampering`, `prevent_custody_tampering`) raise runtime exceptions on any `UPDATE` or `DELETE` statement.
+2. **Cryptographic Chaining:** Each custody event computes a SHA-256 block hash incorporating the previous block's hash, custodian identities, locations, and timestamps.
+3. **Dual-Layer Access Control:** Client-side route guards prevent unauthorized navigation, while Supabase Row Level Security (RLS) enforces access control at the database engine level.

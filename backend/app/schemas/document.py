@@ -1,66 +1,47 @@
-"""
-Document Pydantic Schemas
-Defines request and response serialization models for document management and versioning.
-"""
-
 from datetime import datetime
-from uuid import UUID
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
 
-from pydantic import BaseModel, ConfigDict
+
+class DocumentCreate(BaseModel):
+    case_id: str = Field(..., description="UUID or Case Number")
+    document_name: str
+    document_type: str = Field(default="Other", description="FIR, Panchnama, Statement, Medical, Forensic, ChargeSheet, Other")
+    file_size_bytes: int = Field(default=0, ge=0)
+    file_format: Optional[str] = "pdf"
+    issuing_authority: Optional[str] = "Bhopal Police"
 
 
-class DocumentVersionResponse(BaseModel):
-    """Immutable document version response representation."""
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    document_id: UUID
-    version_number: int
-    file_hash_sha256: str
-    file_size_bytes: int
-    mime_type: str
-    original_filename: str
-    sanitized_filename: str
-    change_reason: str | None = None
-    created_by: UUID
-    created_by_name: str | None = None
-    is_original: bool
-    integrity_status: str
-    created_at: datetime
-    last_verified_at: datetime | None = None
+class DocumentReviewUpdate(BaseModel):
+    legal_review_status: str = Field(..., description="Pending Review, Scrutiny Cleared, Correction Requested")
+    scrutiny_notes: Optional[str] = None
 
 
 class DocumentResponse(BaseModel):
-    """Document entity response model."""
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    case_id: UUID
-    title: str
-    description: str | None = None
+    id: str
+    case_id: str
+    document_name: str
     document_type: str
-    classification: str
-    status: str
-    current_version_id: UUID | None = None
-    current_version: DocumentVersionResponse | None = None
-    original_filename: str | None = None
-    mime_type: str | None = None
-    file_size_bytes: int | None = None
-    file_hash_sha256: str | None = None
-    uploaded_by: UUID
-    uploaded_by_name: str | None = None
-    versions_count: int = 1
-    created_at: datetime
-    updated_at: datetime | None = None
+    storage_bucket: str = "case-documents"
+    storage_path: Optional[str] = None
+    file_size_bytes: int = 0
+    file_format: Optional[str] = "pdf"
+    sha256_hash: str
+    verification_status: str = "Verified"
+    legal_review_status: str = "Pending Review"
+    issuing_authority: Optional[str] = "Bhopal Police"
+    uploaded_by: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    cases: Optional[Dict[str, Any]] = None
+    uploader: Optional[Dict[str, Any]] = None
 
 
-class DocumentIntegrityResponse(BaseModel):
-    """Result of live cryptographic SHA-256 verification against stored object."""
-    document_id: UUID
-    version_id: UUID
-    version_number: int
+class DocumentVerifyResponse(BaseModel):
+    document_id: str
+    document_name: str
+    is_match: bool
     stored_hash: str
-    computed_hash: str
-    match: bool
+    calculated_hash: str
     integrity_status: str
-    verified_at: datetime
+    verified_at: str

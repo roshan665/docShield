@@ -1,33 +1,15 @@
-"""Health and diagnostic response schemas."""
+from datetime import datetime, timezone
+from pydantic import BaseModel, Field
 
-from pydantic import BaseModel
+
+class HealthData(BaseModel):
+    status: str = Field(default="healthy", description="Operational status of backend service")
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    version: str = Field(..., description="API Version")
+    environment: str = Field(..., description="Runtime environment")
+    supabase_connected: bool = Field(..., description="Whether Supabase credentials are configured")
 
 
 class HealthResponse(BaseModel):
-    """Liveness probe response."""
-    status: str
-    timestamp: str
-    environment: str
-    version: str = "1.0.0"
-
-
-class ServiceStatus(BaseModel):
-    """Detailed health status of each dependency."""
-    database: bool
-    redis: bool
-    storage: bool
-    celery: bool
-
-
-class ReadyResponse(BaseModel):
-    """Readiness probe response."""
-    status: str
-    timestamp: str
-    services: ServiceStatus
-
-
-class TaskTriggerResponse(BaseModel):
-    """Response when enqueuing a background test task."""
-    task_id: str
-    status: str
-    message: str
+    success: bool = True
+    data: HealthData

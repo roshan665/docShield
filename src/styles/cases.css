@@ -1,0 +1,601 @@
+/* ========================================================
+   DocShield — Cases Page Specific Styling
+   Exact match for SIH 26190 reference image
+   ======================================================== */
+
+.cases-page-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 28px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+
+
+
+/* ========================================================
+   1. CASES PAGE HEADER
+   ======================================================== */
+.cases-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-top: 4px;
+}
+
+.cases-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.cases-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.cases-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.btn-add-case-primary {
+  background-color: var(--brand-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(30, 109, 235, 0.15);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-add-case-primary:hover {
+  background-color: var(--brand-blue-hover);
+  box-shadow: 0 4px 10px rgba(30, 109, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+.plus-icon {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+
+/* ========================================================
+   2. HORIZONTAL STATUS SUMMARY & FILTER BAR
+   ======================================================== */
+.cases-filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+/* Status Tabs Group */
+.status-summary-tabs {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 3px;
+  box-shadow: 0 1px 2px rgba(18, 43, 73, 0.03);
+}
+
+.status-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  font-family: inherit;
+}
+
+.status-tab:hover {
+  background-color: var(--bg-subtle);
+}
+
+.status-tab.active {
+  background-color: #F8FAFC;
+}
+
+.tab-active-indicator {
+  position: absolute;
+  bottom: -3px;
+  left: 12px;
+  right: 12px;
+  height: 2.5px;
+  background-color: var(--brand-blue);
+  border-radius: 2px;
+}
+
+.tab-icon-wrap.blue-doc {
+  color: var(--brand-blue);
+}
+
+.tab-icon-wrap svg {
+  width: 17px;
+  height: 17px;
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-green { background-color: #10B981; }
+.dot-blue { background-color: #2563EB; }
+.dot-red { background-color: #EF4444; }
+
+.tab-text-block {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.tab-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.tab-count {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+/* Right Controls Group */
+.cases-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Search Box */
+.cases-search-box {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 38px;
+  width: 280px;
+  box-shadow: 0 1px 2px rgba(18, 43, 73, 0.02);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cases-search-box:focus-within {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(30, 109, 235, 0.12);
+}
+
+.search-icon-svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.cases-search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 12.5px;
+  color: var(--text-dark);
+  margin-left: 8px;
+  font-family: inherit;
+}
+
+.clear-search-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Dropdown Filters */
+.custom-select-wrap {
+  position: relative;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-shadow: 0 1px 2px rgba(18, 43, 73, 0.02);
+}
+
+.toolbar-select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-body);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 20px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.toolbar-select.with-icon {
+  padding-left: 20px;
+}
+
+.sort-icon-svg {
+  position: absolute;
+  left: 10px;
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.select-chevron {
+  position: absolute;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  color: var(--text-light);
+  pointer-events: none;
+}
+
+
+/* ========================================================
+   3. CASES TABLE CARD
+   ======================================================== */
+.cases-table-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.table-responsive-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.main-cases-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.main-cases-table thead tr {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.main-cases-table th {
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.th-sortable:hover {
+  color: var(--text-dark);
+}
+
+.sort-double-arrow {
+  color: #94A3B8;
+  font-size: 13px;
+  margin-left: 4px;
+}
+
+.cases-tr {
+  transition: background-color 0.15s ease;
+}
+
+.cases-tr:hover {
+  background-color: #F8FAFC;
+}
+
+.main-cases-table td {
+  padding: 15px 16px;
+  font-size: 13px;
+  color: var(--text-body);
+  border-bottom: 1px solid #F8FAFC;
+  vertical-align: middle;
+}
+
+.case-number-link {
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: text-decoration 0.15s;
+}
+
+.case-number-link:hover {
+  text-decoration: underline;
+}
+
+.td-section {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Status Badges */
+.case-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.badge-active {
+  background-color: var(--color-active-bg);
+  color: var(--color-active-text);
+}
+
+.badge-review {
+  background-color: var(--color-review-bg);
+  color: var(--color-review-text);
+}
+
+.badge-closed {
+  background-color: var(--color-closed-bg);
+  color: var(--color-closed-text);
+}
+
+.td-date {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+/* Count Pills with Icons */
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.cell-doc-icon, .cell-evid-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Action Button */
+.btn-table-open {
+  background-color: var(--brand-blue-subtle);
+  color: var(--brand-blue);
+  border: 1px solid var(--brand-blue-border);
+  border-radius: 6px;
+  padding: 5px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-table-open:hover {
+  background-color: var(--brand-blue);
+  color: #FFFFFF;
+  border-color: var(--brand-blue);
+}
+
+.th-row-menu, .td-row-menu {
+  width: 32px;
+  text-align: right;
+  position: relative;
+}
+
+.row-menu-dots-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  letter-spacing: -1px;
+}
+
+.row-menu-dots-btn:hover {
+  color: var(--text-dark);
+}
+
+.floating-row-popup {
+  position: absolute;
+  right: 12px;
+  top: 36px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-divider);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  z-index: 100;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.popup-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  text-align: left;
+  font-size: 12.5px;
+  color: var(--text-body);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.popup-item:hover {
+  background-color: var(--bg-subtle);
+  color: var(--brand-blue);
+}
+
+.td-empty-results {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+
+/* ========================================================
+   4. PAGINATION BAR (Inside Table Card)
+   ======================================================== */
+.cases-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid #F1F5F9;
+  background-color: #FFFFFF;
+}
+
+.pagination-info {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.page-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-nav-btn:not(:disabled):hover {
+  background-color: var(--bg-subtle);
+  border-color: #CBD5E1;
+}
+
+.page-number-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.page-number-btn:hover {
+  background-color: var(--bg-subtle);
+  border-color: #CBD5E1;
+}
+
+.page-number-btn.active {
+  background-color: var(--brand-blue);
+  border-color: var(--brand-blue);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+
+/* ========================================================
+   RESPONSIVENESS FOR CASES PAGE
+   ======================================================== */
+@media (max-width: 1080px) {
+  .cases-filter-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .cases-controls-group {
+    width: 100%;
+  }
+  .cases-search-box {
+    flex-grow: 1;
+    width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .cases-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .cases-controls-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .status-summary-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

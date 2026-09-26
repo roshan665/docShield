@@ -1,93 +1,86 @@
-"""
-Pytest Fixtures & Configuration
-Provides async test clients, mocked storage, and application context.
-"""
-
-from unittest.mock import patch
-
+import sys
+from pathlib import Path
 import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
+from fastapi.testclient import TestClient
 
-from app.core.database import AsyncSessionLocal, engine
-from app.main import app
-from app.storage.service import StorageService
+# Ensure root directory is in sys.path
+root_dir = Path(__file__).resolve().parent.parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.insert(0, str(root_dir))
 
-
-class MockStorageService(StorageService):
-    """In-memory mock storage service for isolated testing."""
-
-    def __init__(self):
-        self.store = {}
-
-    def upload(self, file_data, key, bucket, content_type="application/octet-stream", metadata=None):
-        if hasattr(file_data, "read"):
-            data = file_data.read()
-        else:
-            data = file_data
-        self.store[(bucket, key)] = {"data": data, "type": content_type, "meta": metadata or {}}
-        return key
-
-    def download(self, key, bucket):
-        item = self.store.get((bucket, key))
-        if item is None:
-            raise Exception("Not found in mock")
-        return item["data"]
-
-    def download_stream(self, key, bucket, chunk_size=65536):
-        data = self.download(key, bucket)
-        yield data
-
-    def delete(self, key, bucket):
-        return bool(self.store.pop((bucket, key), None))
-
-    def exists(self, key, bucket):
-        return (bucket, key) in self.store
-
-    def get_metadata(self, key, bucket):
-        item = self.store.get((bucket, key))
-        return item["meta"] if item else {}
-
-    def check_health(self):
-        return True
-
-    def ensure_bucket_exists(self, bucket: str):
-        return True
-
-
-@pytest_asyncio.fixture
-async def client():
-    """Async HTTP client bound directly to FastAPI app via ASGI transport."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://testserver") as ac:
-        yield ac
-
-
-@pytest_asyncio.fixture
-async def async_client(client):
-    """Alias for client fixture."""
-    return client
-
-
-@pytest_asyncio.fixture
-async def db_session():
-    """Direct AsyncSession fixture for database tests."""
-    async with AsyncSessionLocal() as session:
-        yield session
-        await session.rollback()
-
+from backend.app.main import app
+from backend.app.core.permissions import Role
+from backend.app.schemas.auth import AuthenticatedUser, UserProfile
 
 
 @pytest.fixture
-def mock_storage():
-    """Provides an in-memory mock storage service instance."""
-    mock = MockStorageService()
-    with patch("app.storage.get_storage_service", return_value=mock):
-        yield mock
+def client():
+    return TestClient(app)
 
 
-@pytest_asyncio.fixture(autouse=True)
-async def dispose_db_connections():
-    """Ensure asyncpg engine pool is cleanly disposed between tests."""
-    yield
-    await engine.dispose()
+@pytest.fixture
+def mock_inspector_user():
+    return AuthenticatedUser(
+        id="usr_insp_123",
+        email="rajesh.kumar@mp.police.gov.in",
+        role=Role.INSPECTOR,
+        profile=UserProfile(
+            id="usr_insp_123",
+            email="rajesh.kumar@mp.police.gov.in",
+            full_name="Insp. Rajesh Kumar",
+            badge_id="INSP-BH-104",
+            role=Role.INSPECTOR,
+            police_station="Bhopal Central Police Station"
+        )
+    )
+
+
+@pytest.fixture
+def mock_admin_user():
+    return AuthenticatedUser(
+        id="usr_admin_999",
+        email="admin.security@mp.police.gov.in",
+        role=Role.ADMIN,
+        profile=UserProfile(
+            id="usr_admin_999",
+            email="admin.security@mp.police.gov.in",
+            full_name="Admin Vikram Singh",
+            badge_id="ADM-HQ-001",
+            role=Role.ADMIN,
+            police_station="Police Headquarters Bhopal"
+        )
+    )
+
+
+@pytest.fixture
+def mock_legal_user():
+    return AuthenticatedUser(
+        id="usr_legal_456",
+        email="priya.sharma@mp.prosecution.gov.in",
+        role=Role.LEGAL_OFFICER,
+        profile=UserProfile(
+            id="usr_legal_456",
+            email="priya.sharma@mp.prosecution.gov.in",
+            full_name="Adv. Priya Sharma",
+            badge_id="LEG-MP-202",
+            role=Role.LEGAL_OFFICER,
+            police_station="District Court Prosecution Wing"
+        )
+    )
+
+
+@pytest.fixture
+def mock_forensic_user():
+    return AuthenticatedUser(
+        id="usr_forensic_789",
+        email="arun.verma@mp.fsl.gov.in",
+        role=Role.FORENSIC_OFFICER,
+        profile=UserProfile(
+            id="usr_forensic_789",
+            email="arun.verma@mp.fsl.gov.in",
+            full_name="Dr. Arun Verma",
+            badge_id="FSL-MP-303",
+            role=Role.FORENSIC_OFFICER,
+            police_station="State Forensic Science Laboratory, Bhopal"
+        )
+    )

@@ -1,127 +1,90 @@
-"""
-Evidence and Chain of Custody Pydantic Schemas
-Defines request and response contracts conforming strictly to SIH 26190 API specification.
-"""
-
-from datetime import datetime
-from typing import Any
-from uuid import UUID
-
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, field_validator
+from backend.app.core.crypto import is_valid_sha256_hash
 
 
-class EvidenceRegisterRequest(BaseModel):
-    title: str = Field(..., min_length=3, max_length=500, description="Evidence title/name")
-    description: str | None = Field(None, max_length=5000, description="Detailed evidence description")
-    evidence_type: str = Field("digital_document", description="Controlled evidence category")
-    sensitivity_level: str = Field("standard", description="standard, sensitive, highly_sensitive, classified")
-    document_id: UUID | None = Field(None, description="Optional associated case document ID")
-    collection_date: datetime | None = Field(None, description="Date and time evidence was seized/collected")
-    collection_location: str | None = Field(None, max_length=1000, description="Location where evidence was gathered")
-    source: str | None = Field(None, max_length=500, description="Source individual, agency, or device")
-    notes: str | None = Field(None, max_length=2000, description="Registration notes or panchnama reference")
+class EvidenceVersionBase(BaseModel):
+    version_number: int = Field(..., ge=1, description="Positive version sequence number")
+    storage_path: str = Field(..., description="Relative path in evidence-vault storage bucket")
+    original_filename: str = Field(..., description="Original client exhibit filename")
+    mime_type: str = Field(default="application/octet-stream", description="Detected MIME type")
+    file_size_bytes: int = Field(..., ge=0, description="Exact file size in bytes")
+    sha256_hash: str = Field(..., description="Authoritative 64-character SHA-256 hexadecimal digest")
+    change_reason: str = Field(default="Initial Exhibit Seizure Deposition", description="Forensic audit reason")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Diagnostic/forensic metadata")
+
+    @field_validator("sha256_hash")
+    @classmethod
+    def validate_hash_format(cls, v: str) -> str:
+        if not is_valid_sha256_hash(v):
+            raise ValueError(f"Invalid SHA-256 hash format '{v}'. Must be exactly 64 hexadecimal characters.")
+        return v.lower()
 
 
-class EvidenceUpdateRequest(BaseModel):
-    title: str | None = Field(None, min_length=3, max_length=500)
-    description: str | None = Field(None, max_length=5000)
-    sensitivity_level: str | None = Field(None)
-    collection_location: str | None = Field(None, max_length=1000)
-    source: str | None = Field(None, max_length=500)
+class EvidenceVersionCreate(EvidenceVersionBase):
+    evidence_id: str = Field(..., description="Parent evidence UUID")
+    created_by: Optional[str] = Field(None, description="Authenticated officer UUID")
 
 
-class EvidenceStatusTransitionRequest(BaseModel):
-    target_status: str = Field(..., description="Target lifecycle state")
-    reason: str = Field(..., min_length=3, max_length=1000, description="Legal/investigative reason for state transition")
-    location: str | None = Field(None, max_length=500)
-    notes: str | None = Field(None, max_length=2000)
-
-
-class EvidenceCustodyTransferRequest(BaseModel):
-    to_user_id: UUID = Field(..., description="Target recipient officer ID who must be an active case member")
-    reason: str = Field(..., min_length=5, max_length=1000, description="Official purpose of custody handover")
-    location: str | None = Field(None, max_length=500, description="Transfer location, e.g. Cyber Forensic Lab")
-    notes: str | None = Field(None, max_length=2000, description="Handover notes or parcel seal numbers")
-
-
-class EvidenceCustodyAcknowledgeRequest(BaseModel):
-    location: str | None = Field(None, max_length=500, description="Receipt location")
-    notes: str | None = Field(None, max_length=2000, description="Receipt notes, verification acknowledgment")
-
-
-class CustodyEventResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    evidence_id: UUID
-    case_id: UUID
-    event_type: str
-    from_user_id: UUID | None = None
-    to_user_id: UUID
-    from_user_name: str | None = None
-    to_user_name: str | None = None
-    reason: str
-    location: str | None = None
-    notes: str | None = None
-    file_hash_at_event: str | None = None
-    previous_event_hash: str
-    event_hash: str
-    acknowledgement_status: str
-    acknowledged_at: datetime | None = None
-    event_metadata: dict[str, Any] = Field(default_factory=dict)
+class EvidenceVersionResponse(EvidenceVersionBase):
+    id: str = Field(..., description="Unique version record UUID")
+    evidence_id: str = Field(..., description="Parent evidence UUID")
+    created_by: Optional[str] = None
     created_at: datetime
 
 
-class EvidenceResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    case_id: UUID
-    document_id: UUID | None = None
-    evidence_number: str
-    title: str
-    description: str | None = None
-    evidence_type: str
-    status: str
-    sensitivity_level: str
-    original_file_hash: str | None = None
-    current_file_hash: str | None = None
-    integrity_status: str
-    current_custodian_id: UUID
-    current_custodian_name: str | None = None
-    pending_custodian_id: UUID | None = None
-    pending_custodian_name: str | None = None
-    transfer_pending: bool = False
-    transfer_reason: str | None = None
-    storage_key: str | None = None
-    storage_bucket: str | None = None
-    mime_type: str | None = None
-    file_size_bytes: int | None = None
-    collection_date: datetime | None = None
-    collection_location: str | None = None
-    source: str | None = None
-    registered_by_id: UUID
-    registered_by_name: str | None = None
-    created_at: datetime
-    updated_at: datetime | None = None
-    archived_at: datetime | None = None
-    custody_events_count: int = 0
+class EvidenceSummary(BaseModel):
+    id: str = Field(..., description="Evidence UUID")
+    evidence_tag: str = Field(..., description="Unique statutory exhibit tag (e.g. EV-2024-001)")
+    case_id: str = Field(..., description="Parent case UUID")
+    evidence_type: str = Field(..., description="Physical, Digital, Firearm, Biological, etc.")
+    description: str
+    seal_number: str
+    current_location: str
+    current_version: int = Field(default=1, ge=1)
+    storage_path: Optional[str] = None
+    sha256_hash: Optional[str] = None
+    verification_status: str = Field(default="Verified")
+    status: str = Field(default="Secured")
+    versions: List[EvidenceVersionResponse] = Field(default_factory=list)
 
 
-class CustodyChainVerificationResponse(BaseModel):
-    valid: bool
-    events_checked: int
-    first_invalid_event: str | None = None
-    reason: str | None = None
-    genesis_hash: str | None = None
-    tip_hash: str | None = None
+class EvidenceVersionListResponse(BaseModel):
+    success: bool = True
+    evidence_id: str
+    total_versions: int
+    data: List[EvidenceVersionResponse]
 
 
-class EvidenceIntegrityResponse(BaseModel):
-    evidence_id: UUID
-    original_hash: str | None = None
-    current_hash: str | None = None
-    match: bool
-    integrity_status: str
-    checked_at: datetime
+class IntegrityVerificationResponse(BaseModel):
+    evidence_id: str = Field(..., description="Evidence UUID")
+    evidence_tag: Optional[str] = Field(None, description="Statutory exhibit tag")
+    version_id: Optional[str] = Field(None, description="Version UUID if specific version verified")
+    version_number: Optional[int] = Field(None, description="Version sequence number")
+    stored_hash: str = Field(..., description="Authoritative trusted SHA-256 hash recorded in ledger")
+    calculated_hash: str = Field(..., description="Calculated SHA-256 hash from actual downloaded storage bytes")
+    integrity_status: str = Field(..., description="'VERIFIED' on match, or 'MISMATCH' on tampering")
+    is_match: bool = Field(..., description="True if byte-level hash matches recorded trusted hash")
+    verified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="Timestamp of cryptographic verification")
+    verified_by: Optional[str] = Field(None, description="Officer ID or badge of verifier")
+    details: str = Field(..., description="Cryptographic diagnosis and custody note")
 
+
+class EvidenceDetailResponse(BaseModel):
+    id: str = Field(..., description="Evidence UUID")
+    evidence_tag: str = Field(..., description="Statutory exhibit tag")
+    case_id: str = Field(..., description="Parent case UUID")
+    evidence_type: str = Field(..., description="Physical, Digital, Firearm, Biological, etc.")
+    description: str
+    seal_number: str
+    current_location: str
+    current_version: int = Field(default=1, ge=1)
+    storage_path: Optional[str] = None
+    sha256_hash: Optional[str] = None
+    file_size_bytes: int = Field(default=0, ge=0)
+    mime_type: str = Field(default="application/octet-stream")
+    verification_status: str = Field(default="Verified")
+    examination_status: str = Field(default="Pending Examination")
+    status: str = Field(default="Secured")
+    created_at: Optional[datetime] = None

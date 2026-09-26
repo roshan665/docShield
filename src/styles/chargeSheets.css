@@ -1,0 +1,408 @@
+/* ========================================================
+   DocShield — Inspector Charge Sheets Page Styling
+   Exact match for SIH 26190 reference image
+   ======================================================== */
+
+.chargesheets-page-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 28px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* ========================================================
+   1. PAGE HEADER
+   ======================================================== */
+.chargesheets-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-top: 4px;
+}
+
+.chargesheets-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.chargesheets-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.chargesheets-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.btn-add-chargesheet-primary {
+  background-color: var(--brand-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(30, 109, 235, 0.15);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-add-chargesheet-primary:hover {
+  background-color: var(--brand-blue-hover);
+  box-shadow: 0 4px 10px rgba(30, 109, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ========================================================
+   2. STATUS SUMMARY STRIP (7 compact filter cards)
+   ======================================================== */
+.chargesheets-category-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.cs-cat-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  text-align: left;
+  min-width: 0;
+}
+
+.cs-cat-card:hover {
+  border-color: #CBD5E1;
+  background-color: #FAFCFE;
+}
+
+.cs-cat-card.active {
+  background-color: #F8FAFC;
+  border-color: #D2E4FA;
+}
+
+.cs-cat-active-line {
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2.5px;
+  background-color: var(--brand-blue);
+  border-radius: 2px;
+}
+
+.cs-cat-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cs-cat-icon-box svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cs-icon-blue { background-color: var(--kpi-blue-bg); color: var(--brand-blue); }
+.cs-icon-orange { background-color: #FFF0E6; color: #F97316; }
+.cs-icon-green { background-color: #E6F8ED; color: #10B981; }
+.cs-icon-red { background-color: #FEECEE; color: #EF4444; }
+.cs-icon-gray { background-color: #F1F5F9; color: #64748B; }
+
+.cs-cat-text-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-cat-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.cs-cat-label.active {
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
+.cs-cat-count {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.15;
+  margin-top: 2px;
+  letter-spacing: -0.01em;
+}
+
+/* ========================================================
+   3. SEARCH AND FILTER TOOLBAR
+   ======================================================== */
+.chargesheets-filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.chargesheets-search-box {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 38px;
+  width: 380px;
+  box-shadow: 0 1px 2px rgba(18, 43, 73, 0.02);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.chargesheets-search-box:focus-within {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(30, 109, 235, 0.12);
+}
+
+.chargesheets-search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 12.5px;
+  color: var(--text-dark);
+  margin-left: 8px;
+  font-family: inherit;
+}
+
+.chargesheets-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ========================================================
+   4. CHARGE SHEET TABLE CARD
+   ======================================================== */
+.chargesheets-table-card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.main-chargesheets-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.main-chargesheets-table thead tr {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.main-chargesheets-table th {
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chargesheets-tr {
+  transition: background-color 0.15s ease;
+}
+
+.chargesheets-tr:hover {
+  background-color: #F8FAFC;
+}
+
+.main-chargesheets-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-body);
+  border-bottom: 1px solid #F8FAFC;
+  vertical-align: middle;
+}
+
+/* Checkbox styling */
+.cs-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--brand-blue);
+  border-radius: 4px;
+}
+
+/* Charge Sheet ID Link */
+.cs-id-link {
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cs-id-link:hover {
+  text-decoration: underline;
+}
+
+/* Case Link */
+.cs-case-link {
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cs-case-link:hover {
+  text-decoration: underline;
+}
+
+/* Type / Section Text */
+.cs-section-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+/* Two-line Meta Cells */
+.cs-two-line-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-primary-meta {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.cs-secondary-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* Status Badges */
+.cs-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cs-status-submitted { background-color: #E8F8EE; color: #059669; }
+.cs-status-review { background-color: #EBF3FC; color: #2563EB; }
+.cs-status-draft { background-color: #FEF3C7; color: #D97706; }
+.cs-status-accepted { background-color: #E8F8EE; color: #059669; }
+.cs-status-returned { background-color: #FEECEE; color: #EF4444; }
+
+/* Documents Count Cell */
+.cs-documents-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.cs-documents-cell svg {
+  width: 15px;
+  height: 15px;
+  color: #64748B;
+}
+
+/* Action Icons */
+.cs-action-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cs-action-btn {
+  background: none;
+  border: none;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-action-btn:hover {
+  color: var(--brand-blue);
+  background-color: #F1F5F9;
+}
+
+.cs-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ========================================================
+   5. RESPONSIVENESS
+   ======================================================== */
+@media (max-width: 1280px) {
+  .chargesheets-category-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .chargesheets-category-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .chargesheets-search-box {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .chargesheets-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .chargesheets-category-strip {
+    grid-template-columns: 1fr;
+  }
+}

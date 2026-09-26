@@ -1,186 +1,63 @@
-"""
-Application Configuration Management
-Uses Pydantic BaseSettings to load and validate environment variables.
-"""
-
+from typing import List, Optional, Union
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """
+    Centralized typed configuration for DocShield FastAPI Backend.
+    Loads from environment variables and .env file.
+    """
+    PROJECT_NAME: str = "DocShield Backend"
+    VERSION: str = "1.0.0"
+    API_V1_PREFIX: str = "/api/v1"
+    ENVIRONMENT: str = "development"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+
+    # Frontend CORS
+    FRONTEND_URL: str = "http://localhost:5173"
+    ALLOWED_ORIGINS: Union[List[str], str] = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+    CORS_ORIGIN_REGEX: Optional[str] = r"^https:\/\/.*\.onrender\.com$"
+    SERVE_STATIC_FRONTEND: bool = False
+
+    # Supabase Configuration
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
+    SUPABASE_JWT_SECRET: Optional[str] = None
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "backend/.env"),
         env_file_encoding="utf-8",
-        case_sensitive=True,
-        extra="ignore",
+        extra="ignore"
     )
 
-    # General Project Info
-    APP_NAME: str = "Secure Digital Evidence Management Platform"
-    APP_ENV: str = "development"
-    APP_DEBUG: bool = True
-    API_V1_STR: str = "/api/v1"
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() in ("production", "prod")
 
     @property
-    def DEBUG(self) -> bool:
-        return self.APP_DEBUG
+    def cors_origins(self) -> List[str]:
+        if isinstance(self.ALLOWED_ORIGINS, str):
+            origins = [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
+        else:
+            origins = list(self.ALLOWED_ORIGINS)
 
-    # Database Configuration (PostgreSQL 16 + pgvector)
-    DATABASE_URL: str | None = None
-    POSTGRES_USER: str = "sih_user"
-    POSTGRES_PASSWORD: str = "sih_secure_password_dev"
-    POSTGRES_SERVER: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "sih190"
+        # Ensure FRONTEND_URL is included if specified
+        if self.FRONTEND_URL and self.FRONTEND_URL != "*" and self.FRONTEND_URL not in origins:
+            origins.append(self.FRONTEND_URL)
 
-    # Supabase Integration
-    SUPABASE_URL: str = "https://iwinomhcofhouapfirjo.supabase.co"
-    SUPABASE_ANON_KEY: str = ""
-    SUPABASE_SERVICE_ROLE_KEY: str = ""
-
-    # Redis Configuration
-    REDIS_URL_OVERRIDE: str | None = None
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_PASSWORD: str = "sih_redis_pass_dev"
-    REDIS_DB: int = 0
-
-    # Object Storage (MinIO / S3)
-    S3_ENDPOINT_URL: str = "http://localhost:9000"
-    S3_ACCESS_KEY: str = "minio_admin"
-    S3_SECRET_KEY: str = "minio_secret_key_dev"
-    S3_BUCKET_DOCUMENTS: str = "sih190-documents"
-    S3_BUCKET_EVIDENCE: str = "sih190-evidence"
-    S3_REGION: str = "us-east-1"
-    S3_USE_SSL: bool = False
-
-    # File Ingestion & Security
-    MAX_UPLOAD_SIZE_BYTES: int = 50 * 1024 * 1024  # 50 MB
-    ALLOWED_DOCUMENT_MIME_TYPES: list[str] = [
-        "application/pdf",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "image/jpeg",
-        "image/png",
-    ]
-
-    # Malware Scanning (ClamAV Integration)
-    CLAMAV_HOST: str = "localhost"
-    CLAMAV_PORT: int = 3310
-    CLAMAV_TIMEOUT_SECONDS: int = 10
-    MALWARE_SCAN_REQUIRED: bool = False
-
-    # Security & Cryptography
-    JWT_SECRET_KEY: str = "replace_with_64_char_hex_secret_key_minimum_production_only_value"
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-
-    # CORS
-    BACKEND_CORS_ORIGINS: list[str] | str = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://*.onrender.com",
-    ]
-
-    # Logging & Rate Limiting
-    LOG_LEVEL: str = "INFO"
-    RATE_LIMIT_DEFAULT: str = "100/minute"
-
-    # AI Pipeline & Vector Search Configuration (Google Gemini 2.5 & pgvector)
-    GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash"
-    EMBEDDING_MODEL: str = "models/text-embedding-004"
-    EMBEDDING_DIMENSIONS: int = 768
-    CHUNK_SIZE: int = 1000
-    CHUNK_OVERLAP: int = 200
-    SEMANTIC_SEARCH_TOP_K: int = 10
-    MIN_SIMILARITY_THRESHOLD: float = 0.6
-    OCR_ENABLED: bool = True
-    SEARCH_RATE_LIMIT_PER_MINUTE: int = 30
-    RAG_RATE_LIMIT_PER_MINUTE: int = 15
+        # Security Guard: When credentials are enabled or in production, reject wildcard "*"
+        if self.is_production or "*" in origins:
+            cleaned = [o for o in origins if o != "*"]
+            if not cleaned:
+                return [self.FRONTEND_URL] if self.FRONTEND_URL and self.FRONTEND_URL != "*" else []
+            return cleaned
+        return origins
 
     @property
-    def CORS_ORIGINS_LIST(self) -> list[str]:
-        if isinstance(self.BACKEND_CORS_ORIGINS, list):
-            return self.BACKEND_CORS_ORIGINS
-        if isinstance(self.BACKEND_CORS_ORIGINS, str):
-            return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
-        return ["*"]
-
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> str:
-        """Async connection string for SQLAlchemy asyncpg engine"""
-        url = (self.DATABASE_URL or "").strip()
-        if url:
-            if url.startswith("postgres://"):
-                url = "postgresql+asyncpg://" + url[len("postgres://"):]
-            elif url.startswith("postgresql://"):
-                url = "postgresql+asyncpg://" + url[len("postgresql://"):]
-            elif url.startswith("postgresql+psycopg://"):
-                url = "postgresql+asyncpg://" + url[len("postgresql+psycopg://"):]
-            elif url.startswith("postgresql+psycopg2://"):
-                url = "postgresql+asyncpg://" + url[len("postgresql+psycopg2://"):]
-            
-            # Clean up sslmode parameter for asyncpg compatibility
-            if "?sslmode=require" in url:
-                url = url.replace("?sslmode=require", "?ssl=require")
-            elif "&sslmode=require" in url:
-                url = url.replace("&sslmode=require", "&ssl=require")
-            elif "?sslmode=disable" in url:
-                url = url.replace("?sslmode=disable", "")
-            elif "&sslmode=disable" in url:
-                url = url.replace("&sslmode=disable", "")
-            return url
-
-        if self.POSTGRES_SERVER and self.POSTGRES_SERVER != "localhost":
-            return (
-                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-                f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-            )
-        
-        # Safe fallback for cloud deployments without an active PostgreSQL service
-        return "sqlite+aiosqlite:///./docshield.db"
-
-    @property
-    def SQLALCHEMY_SYNC_DATABASE_URI(self) -> str:
-        """Sync connection string for Alembic migrations"""
-        url = (self.DATABASE_URL or "").strip()
-        if url:
-            if url.startswith("postgres://"):
-                url = "postgresql+psycopg://" + url[len("postgres://"):]
-            elif url.startswith("postgresql://"):
-                url = "postgresql+psycopg://" + url[len("postgresql://"):]
-            elif url.startswith("postgresql+asyncpg://"):
-                url = "postgresql+psycopg://" + url[len("postgresql+asyncpg://"):]
-            return url
-
-        if self.POSTGRES_SERVER and self.POSTGRES_SERVER != "localhost":
-            return (
-                f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-                f"{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-            )
-        return "sqlite:///./docshield.db"
-
-    @property
-    def REDIS_URL(self) -> str:
-        """Redis connection URL"""
-        import os
-        env_redis = self.REDIS_URL_OVERRIDE or os.environ.get("REDIS_URL")
-        if env_redis:
-            return env_redis
-        if self.REDIS_PASSWORD:
-            return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
-
-    @property
-    def CELERY_BROKER_URL(self) -> str:
-        """Celery broker URL"""
-        return self.REDIS_URL
-
-    @property
-    def CELERY_RESULT_BACKEND(self) -> str:
-        """Celery results backend URL"""
-        return self.REDIS_URL
+    def is_supabase_configured(self) -> bool:
+        return bool(self.SUPABASE_URL and self.SUPABASE_ANON_KEY)
 
 
 settings = Settings()
